@@ -1,4 +1,4 @@
-package com.example.securechatapp.model
+package com.example.securechatapp.data.model
 
 import com.google.gson.annotations.SerializedName
 

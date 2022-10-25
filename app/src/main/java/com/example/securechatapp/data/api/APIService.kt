@@ -1,7 +1,7 @@
-package com.example.securechatapp.api
+package com.example.securechatapp.data.api
 
-import com.example.securechatapp.model.Playlist
-import com.example.securechatapp.model.ResponseObject
+import com.example.securechatapp.data.model.Playlist
+import com.example.securechatapp.data.model.ResponseObject
 import retrofit2.Call
 import retrofit2.http.*
 

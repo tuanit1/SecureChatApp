@@ -3,21 +3,31 @@ package com.example.securechatapp
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.securechatapp.api.API
-import com.example.securechatapp.model.Playlist
-import com.example.securechatapp.model.ResponseObject
+import com.example.securechatapp.data.api.API
+import com.example.securechatapp.data.model.Playlist
+import com.example.securechatapp.data.model.ResponseObject
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
+
+    private var firebaseAuth: FirebaseAuth? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        firebaseAuth = FirebaseAuth.getInstance()
+
+        Log.e("tuan",  firebaseAuth.toString())
+
+
 //        getAllPlaylist()
 //        getPlaylistByID()
-        createPlaylist()
+//        createPlaylist()
 
     }
 

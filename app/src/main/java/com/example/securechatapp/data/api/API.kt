@@ -1,4 +1,4 @@
-package com.example.securechatapp.api
+package com.example.securechatapp.data.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
