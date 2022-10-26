@@ -2,10 +2,18 @@ package com.example.securechatapp
 
 import android.os.Bundle
 import android.util.Log
+import android.window.OnBackInvokedCallback
+import android.window.OnBackInvokedDispatcher
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.model.Playlist
 import com.example.securechatapp.data.model.ResponseObject
+import com.example.securechatapp.databinding.ActivityMainBinding
+import com.example.securechatapp.extension.addFragment
+import com.example.securechatapp.extension.replaceFragment
+import com.example.securechatapp.ui.auth.signup.fragments.LoginFragment
+import com.example.securechatapp.ui.auth.signup.fragments.SignupFragment
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Call
@@ -14,22 +22,48 @@ import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
 
-    private var firebaseAuth: FirebaseAuth? = null
+    private var binding: ActivityMainBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        Log.e("tuan",  firebaseAuth.toString())
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
 
 
-//        getAllPlaylist()
-//        getPlaylistByID()
-//        createPlaylist()
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val count = supportFragmentManager.backStackEntryCount
+                if(count > 0){
+                    supportFragmentManager.popBackStack()
+                }else{
+                    finish()
+                }
+            }
+        })
+
+        initView()
+
 
     }
+
+
+    private fun initView() {
+        replaceFragment(
+            containerId = getContainerId(),
+            fragment = SignupFragment.newInstance(),
+            addToBackStack = true,
+            tag = getString(R.string.signup)
+        )
+
+        addFragment(
+            containerId = getContainerId(),
+            fragment = LoginFragment.newInstance(),
+            addToBackStack = false,
+            tag = "login"
+        )
+    }
+
+    private fun getContainerId() = R.id.fragmentContainerView
 
     private fun getAllPlaylist() {
         API.apiService.getAllPlaylist()
