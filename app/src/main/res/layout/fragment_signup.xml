@@ -1,15 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/teal_700"
-    tools:context=".ui.auth.signup.fragments.SignupFragment">
+    android:layout_height="wrap_content"
+    tools:context=".ui.auth.signup.fragments.SignupFragment"
+    tools:ignore="SpeakableTextPresentCheck">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Signup fragment" />
+        android:layout_height="wrap_content"
+        tools:context=".ui.auth.signup.fragments.SignupFragment">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.example.securechatapp.widget.CustomFormEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:isPassword="true"
+            app:hintText="Tuan"
+            app:image="@drawable/ic_user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </com.example.securechatapp.widget.CustomFormEditText>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+

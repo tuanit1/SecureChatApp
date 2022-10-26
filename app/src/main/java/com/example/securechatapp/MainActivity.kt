@@ -2,8 +2,6 @@ package com.example.securechatapp
 
 import android.os.Bundle
 import android.util.Log
-import android.window.OnBackInvokedCallback
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.securechatapp.data.api.API
@@ -12,10 +10,8 @@ import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.replaceFragment
-import com.example.securechatapp.ui.auth.signup.fragments.LoginFragment
+import com.example.securechatapp.ui.auth.login.fragments.LoginFragment
 import com.example.securechatapp.ui.auth.signup.fragments.SignupFragment
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -53,13 +49,6 @@ class MainActivity : AppCompatActivity() {
             fragment = SignupFragment.newInstance(),
             addToBackStack = true,
             tag = getString(R.string.signup)
-        )
-
-        addFragment(
-            containerId = getContainerId(),
-            fragment = LoginFragment.newInstance(),
-            addToBackStack = false,
-            tag = "login"
         )
     }
 

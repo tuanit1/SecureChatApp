@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#BB7D7D"
-    tools:context=".ui.auth.signup.fragments.LoginFragment">
+    tools:context=".ui.auth.login.fragments.LoginFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView

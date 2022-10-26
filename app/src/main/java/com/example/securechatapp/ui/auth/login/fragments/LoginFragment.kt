@@ -1,4 +1,4 @@
-package com.example.securechatapp.ui.auth.signup.fragments
+package com.example.securechatapp.ui.auth.login.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
