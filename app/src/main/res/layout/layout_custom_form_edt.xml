@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="20dp"
+    android:elevation="20dp"
     android:layout_marginHorizontal="30dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,28 +30,24 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
-            style="@style/Widget.AppCompat.EditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColorHint="@color/amazon"
-            app:hintTextColor="@color/amazon"
-            app:boxBackgroundColor="@android:color/transparent"
+            app:boxBackgroundColor="@color/lightGray"
             app:boxStrokeWidth="0dp"
+            app:expandedHintEnabled="true"
+            app:hintTextColor="@color/amazon"
             app:boxStrokeWidthFocused="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/ivIcon"
+            app:layout_constraintStart_toEndOf="@id/ivIcon"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtForm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
-                android:inputType="text"
-                android:maxLines="1"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textCursorDrawable="@color/amazon" />
 
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

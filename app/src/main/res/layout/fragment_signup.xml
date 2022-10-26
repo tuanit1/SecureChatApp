@@ -14,16 +14,15 @@
         tools:context=".ui.auth.signup.fragments.SignupFragment">
 
         <com.example.securechatapp.widget.CustomFormEditText
+            android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:isPassword="true"
-            app:hintText="Tuan"
+            app:isPassword="false"
+            app:hintText="Email"
             app:image="@drawable/ic_user"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-        </com.example.securechatapp.widget.CustomFormEditText>
+            app:layout_constraintTop_toTopOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

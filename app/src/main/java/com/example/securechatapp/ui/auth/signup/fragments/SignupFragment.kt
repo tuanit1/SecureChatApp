@@ -1,11 +1,12 @@
 package com.example.securechatapp.ui.auth.signup.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.securechatapp.R
+import androidx.core.widget.doOnTextChanged
 import com.example.securechatapp.databinding.FragmentSignupBinding
 
 class SignupFragment : Fragment() {
@@ -23,7 +24,11 @@ class SignupFragment : Fragment() {
     ): View? {
         binding = FragmentSignupBinding.inflate(layoutInflater)
 
-
+        binding?.run {
+            edtEmail._binding?.edtForm?.doOnTextChanged { text, start, before, count ->
+                Log.e("AAAA", text.toString())
+            }
+        }
 
         return binding?.root
     }
