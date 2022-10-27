@@ -1,10 +1,12 @@
 package com.example.securechatapp.widget
 
 import android.content.Context
+import android.text.Editable
 import android.text.method.PasswordTransformationMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.cardview.widget.CardView
+import androidx.core.widget.doOnTextChanged
 import com.example.securechatapp.R
 import com.example.securechatapp.databinding.LayoutCustomFormEdtBinding
 import com.google.android.material.textfield.TextInputLayout
@@ -14,18 +16,25 @@ class CustomFormEditText @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : CardView(context, attrs, defStyleAttr){
-    var _binding: LayoutCustomFormEdtBinding? = null
+    private var binding: LayoutCustomFormEdtBinding? = null
+
+    fun getText(): String = binding?.edtForm?.text.toString()
+    var onTextChange: (text: String) -> Unit = {}
 
     init {
         initView(attrs)
     }
 
     private fun initView(attrs: AttributeSet?) {
-        _binding = LayoutCustomFormEdtBinding.inflate(LayoutInflater.from(context), this, true)
+        binding = LayoutCustomFormEdtBinding.inflate(LayoutInflater.from(context), this, true)
         val styleAttrs = context.obtainStyledAttributes(attrs, R.styleable.CustomFormEditText)
         try {
-            _binding?.apply {
+            binding?.apply {
                 textInputLayout.hint = styleAttrs.getString(R.styleable.CustomFormEditText_hintText)
+
+                edtForm.doOnTextChanged { text, _, _, _ ->
+                    onTextChange(text.toString())
+                }
 
                 ivIcon.setImageDrawable(styleAttrs.getDrawable(R.styleable.CustomFormEditText_image))
 

@@ -25,8 +25,8 @@ class SignupFragment : Fragment() {
         binding = FragmentSignupBinding.inflate(layoutInflater)
 
         binding?.run {
-            edtEmail._binding?.edtForm?.doOnTextChanged { text, start, before, count ->
-                Log.e("AAAA", text.toString())
+            edtEmail.onTextChange = { text ->
+                Log.e("AAAA", text)
             }
         }
 
