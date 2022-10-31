@@ -1,93 +1,87 @@
-package com.example.securechatapp.ui.auth.login.fragments
+package com.example.securechatapp.ui.auth.signup
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.example.securechatapp.R
-import com.example.securechatapp.databinding.FragmentLoginBinding
-import com.example.securechatapp.extension.addFragment
-import com.example.securechatapp.extension.replaceFragment
-import com.example.securechatapp.ui.auth.signup.fragments.SignupFragment
-import com.example.securechatapp.ui.home.HomeFragment
+import androidx.fragment.app.Fragment
+import com.example.securechatapp.databinding.FragmentSignupBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+class SignupFragment : Fragment() {
 
-class LoginFragment : Fragment() {
 
     companion object {
-        fun newInstance() = LoginFragment()
+        fun newInstance() = SignupFragment()
     }
 
     private lateinit var auth: FirebaseAuth
-    private var binding: FragmentLoginBinding? = null
+
+    private var binding: FragmentSignupBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentLoginBinding.inflate(inflater)
-        auth = Firebase.auth
+        binding = FragmentSignupBinding.inflate(layoutInflater)
 
         return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initView()
         initListener()
-
     }
 
     private fun initListener() {
         binding?.run {
+            btnSignup.setOnClickListener{
+                handleSignup()
+            }
+
+            tvBack.setOnClickListener{
+                parentFragmentManager.popBackStack()
+            }
         }
     }
 
-    private fun handleLoginClick() {
+    private fun handleSignup() {
         binding?.run {
             val email: String = edtEmail.getText()
             val password: String = edtPass.getText()
+            val age: String = edtAge.getText()
+            val phone: String = edtPhone.getText()
+            val name: String = edtName.getText()
 
-            if(email.isEmpty() || password.isEmpty()){
+            if(email.isEmpty() || password.isEmpty() || phone.isEmpty() || name.isEmpty()){
                 Toast.makeText(context, "Some field is missing, please check again!", Toast.LENGTH_SHORT).show();
             }else{
-                btnLogin.showProgress(true)
-                auth.signInWithEmailAndPassword(email, password)
+                btnSignup.showProgress(true)
+                auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener{
-                        btnLogin.showProgress(false)
+                        btnSignup.showProgress(false)
                         if(it.isSuccessful){
-                            Toast.makeText(context, "login successfully!", Toast.LENGTH_SHORT).show()
-                            openHomeFragment()
+                            Toast.makeText(context, "Sign up successfully!", Toast.LENGTH_SHORT).show()
+                            parentFragmentManager.popBackStack()
                         }else{
                             it.exception?.let { e ->
                                 Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }.addOnFailureListener{
-                        btnLogin.showProgress(false)
+                        btnSignup.showProgress(false)
                         Toast.makeText(context, it.message.toString(), Toast.LENGTH_SHORT).show()
                     }
             }
         }
     }
 
-    private fun openHomeFragment() {
-
-        replaceFragment(
-            getContainerId(),
-            HomeFragment.newInstance(),
-            addToBackStack = true,
-            tag = HomeFragment::class.java.name
-        )
+    private fun initView() {
+        auth = Firebase.auth
     }
-
-    private fun getContainerId() = R.id.fragmentContainerView
-
-
 
 }

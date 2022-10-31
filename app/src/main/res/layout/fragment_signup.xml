@@ -7,13 +7,13 @@
     android:layout_height="wrap_content"
     android:fillViewport="true"
     android:background="@color/white"
-    tools:context=".ui.auth.signup.fragments.SignupFragment"
+    tools:context=".ui.auth.signup.SignupFragment"
     tools:ignore="SpeakableTextPresentCheck">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".ui.auth.signup.fragments.SignupFragment">
+        tools:context=".ui.auth.signup.SignupFragment">
 
         <ImageView
             android:id="@+id/imageThumb"

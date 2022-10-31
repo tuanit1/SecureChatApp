@@ -1,6 +1,5 @@
 package com.example.securechatapp
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
@@ -10,9 +9,7 @@ import com.example.securechatapp.data.model.Playlist
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
-import com.example.securechatapp.extension.replaceFragment
-import com.example.securechatapp.ui.auth.login.fragments.LoginFragment
-import com.example.securechatapp.ui.auth.signup.fragments.SignupFragment
+import com.example.securechatapp.ui.auth.login.LoginFragment
 import com.example.securechatapp.ui.home.HomeFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
