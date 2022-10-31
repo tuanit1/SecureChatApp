@@ -1,5 +1,6 @@
 package com.example.securechatapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
@@ -12,6 +13,10 @@ import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.replaceFragment
 import com.example.securechatapp.ui.auth.login.fragments.LoginFragment
 import com.example.securechatapp.ui.auth.signup.fragments.SignupFragment
+import com.example.securechatapp.ui.home.HomeFragment
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,37 +24,55 @@ import retrofit2.Response
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
+    private var auth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
+        auth = Firebase.auth
 
+        Log.e("tuan", "onCreate")
+
+        initListener()
+        initView()
+    }
+
+    private fun initListener() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val count = supportFragmentManager.backStackEntryCount
-                if(count > 0){
+                if(count > 1){
                     supportFragmentManager.popBackStack()
                 }else{
                     finish()
                 }
             }
         })
-
-        initView()
-
-
     }
 
-
     private fun initView() {
-        replaceFragment(
-            containerId = getContainerId(),
-            fragment = SignupFragment.newInstance(),
-            addToBackStack = true,
-            tag = getString(R.string.signup)
-        )
+
+        auth?.run {
+            if(currentUser == null){
+                addFragment(
+                    containerId = getContainerId(),
+                    fragment = LoginFragment.newInstance(),
+                    addToBackStack = true,
+                    tag = getString(R.string.login)
+                )
+            }else{
+                addFragment(
+                    containerId = getContainerId(),
+                    fragment = HomeFragment.newInstance(),
+                    addToBackStack = true,
+                    tag = HomeFragment::class.java.name
+                )
+            }
+        }
+
+
     }
 
     private fun getContainerId() = R.id.fragmentContainerView
@@ -129,5 +152,10 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.e("tuan",  "onStart")
     }
 }

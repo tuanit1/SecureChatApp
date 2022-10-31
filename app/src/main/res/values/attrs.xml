@@ -6,4 +6,8 @@
         <attr name="android:inputType"/>
         <attr name="image" format="reference"/>
     </declare-styleable>
+
+    <declare-styleable name="CustomFormButton">
+        <attr name="title" format="string"/>
+    </declare-styleable>
 </resources>
