@@ -3,6 +3,7 @@
     <declare-styleable name="CustomFormEditText">
         <attr name="hintText" format="string"/>
         <attr name="isPassword" format="boolean"/>
+        <attr name="android:inputType"/>
         <attr name="image" format="reference"/>
     </declare-styleable>
 </resources>
