@@ -76,14 +76,9 @@ class SignupFragment : Fragment() {
                         if(it.isSuccessful){
 
                             it.result.user?.run {
-
                                 val newUser = User(uid, name, age, phone, "")
-
-                                 handleAddNewUser(newUser)
+                                handleAddNewUser(newUser)
                             }
-
-                            Toast.makeText(context, "Sign up successfully!", Toast.LENGTH_SHORT).show()
-                            parentFragmentManager.popBackStack()
                         }else{
                             it.exception?.let { e ->
                                 Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()
@@ -99,13 +94,20 @@ class SignupFragment : Fragment() {
 
     private fun handleAddNewUser(user: User) {
 
-
         API.apiService.addUser(user).enqueue(object : Callback<ResponseObject<User>> {
             override fun onResponse(
                 call: Call<ResponseObject<User>>,
                 response: Response<ResponseObject<User>>
             ) {
-                val user = response.body()?.data as User
+                response.body()?.run {
+                    if (success){
+                        auth.signOut()
+                        Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
+                        parentFragmentManager.popBackStack()
+                    }else{
+                        Toast.makeText(context, responseMessage, Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
 
             override fun onFailure(call: Call<ResponseObject<User>>, t: Throwable) {

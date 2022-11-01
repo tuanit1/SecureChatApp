@@ -9,7 +9,7 @@ object API {
         get() {
             if (retrofit == null) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl("http://localhost:8080/api/")
+                    .baseUrl("http://192.168.1.3:8080/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             }
