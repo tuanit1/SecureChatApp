@@ -1,11 +1,14 @@
 package com.example.securechatapp.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import android.view.ViewGroup
 import androidx.fragment.app.commit
+import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.example.securechatapp.R
 import com.example.securechatapp.databinding.FragmentHomeBinding
 import com.example.securechatapp.extension.replaceFragment
@@ -21,6 +24,7 @@ class HomeFragment : Fragment() {
     }
 
     private var binding: FragmentHomeBinding? = null
+    private var mAdapter: ViewPagerAdapter? = null
     private var auth: FirebaseAuth? = null
 
     override fun onCreateView(
@@ -41,6 +45,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun initView() {
+
+        mAdapter = ViewPagerAdapter(this)
+
+        binding?.run {
+            viewPager.adapter = mAdapter
+            viewPager.registerOnPageChangeCallback(object : OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+
+                    when(position){
+                        0 -> bottomNav.menu.findItem(R.id.itemNavMessage).isChecked = true
+                        1 -> bottomNav.menu.findItem(R.id.itemNavSetting).isChecked = true
+                    }
+                }
+            })
+        }
     }
 
     private fun initListener() {
@@ -48,27 +68,11 @@ class HomeFragment : Fragment() {
             bottomNav.setOnItemSelectedListener {
 
                 when (it.itemId) {
-                    R.id.itemNavMessage -> run {
-
-                    }
-                    R.id.itemNavSetting -> run {
-
-                    }
+                    R.id.itemNavMessage -> viewPager.currentItem = 0
+                    R.id.itemNavSetting -> viewPager.currentItem = 1
                 }
 
                 return@setOnItemSelectedListener true
-            }
-        }
-    }
-
-    private fun addFragmentToHost(fragment: Fragment, tag: String){
-
-        childFragmentManager.run {
-            if(findFragmentByTag(tag) == null){
-                commit {
-                    replace(R.id.fragmentContainerHome, fragment, tag)
-                    addToBackStack(tag)
-                }
             }
         }
     }
@@ -83,7 +87,6 @@ class HomeFragment : Fragment() {
         )
     }
 
-
-
     private fun getContainerId() = R.id.fragmentContainerView
+
 }

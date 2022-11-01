@@ -10,7 +10,6 @@ import com.example.securechatapp.R
 import com.example.securechatapp.databinding.LayoutCustomFormButtonBinding
 import com.google.android.material.textfield.TextInputLayout
 
-
 class CustomFormButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -19,6 +18,7 @@ class CustomFormButton @JvmOverloads constructor(
     private var binding: LayoutCustomFormButtonBinding? = null
 
     var showProgress: (Boolean) -> Unit = {}
+
 
     init {
         initView(attrs)

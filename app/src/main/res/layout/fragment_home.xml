@@ -7,29 +7,28 @@
     android:background="@color/white"
     tools:context=".ui.home.HomeFragment">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="0dp"
-        android:layout_height="75dp"
-        app:menu="@menu/menu_bottom_nav"
-        android:background="@color/white"
-        app:labelVisibilityMode="unlabeled"
-        app:itemIconSize="30dp"
-        app:itemIconTint="@color/selector_nav_color"
-        app:backgroundTint="@color/greenCrayola"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerHome"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:background="@color/white"
+        app:backgroundTint="@color/greenCrayola"
+        app:itemIconSize="30dp"
+        app:itemIconTint="@color/selector_nav_color"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/menu_bottom_nav" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
