@@ -77,16 +77,4 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun handleSignOut(){
-        auth?.signOut()
-        replaceFragment(
-            getContainerId(),
-            LoginFragment.newInstance(),
-            addToBackStack = true,
-            tag = LoginFragment::class.java.name
-        )
-    }
-
-    private fun getContainerId() = R.id.fragmentContainerView
-
 }

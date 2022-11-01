@@ -9,7 +9,7 @@ object API {
         get() {
             if (retrofit == null) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl("https://tuanpc.pw/mp3/api/")
+                    .baseUrl("http://localhost:8080/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             }

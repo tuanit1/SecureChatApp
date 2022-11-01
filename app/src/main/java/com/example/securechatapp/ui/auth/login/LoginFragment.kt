@@ -8,7 +8,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.example.securechatapp.R
 import com.example.securechatapp.databinding.FragmentLoginBinding
+import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.replaceFragment
+import com.example.securechatapp.ui.auth.signup.SignupFragment
 import com.example.securechatapp.ui.home.HomeFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -42,6 +44,18 @@ class LoginFragment : Fragment() {
 
     private fun initListener() {
         binding?.run {
+            btnLogin.setOnClickListener{
+                handleLoginClick()
+            }
+
+            tvSignup.setOnClickListener {
+                addFragment(
+                    getContainerId(),
+                    SignupFragment.newInstance(),
+                    true,
+                    SignupFragment::class.java.name
+                )
+            }
         }
     }
 

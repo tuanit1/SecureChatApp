@@ -1,15 +1,23 @@
 package com.example.securechatapp.ui.auth.signup
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.securechatapp.data.api.API
+import com.example.securechatapp.data.api.APIService
+import com.example.securechatapp.data.model.ResponseObject
+import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentSignupBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignupFragment : Fragment() {
 
@@ -63,8 +71,17 @@ class SignupFragment : Fragment() {
                 btnSignup.showProgress(true)
                 auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener{
+
                         btnSignup.showProgress(false)
                         if(it.isSuccessful){
+
+                            it.result.user?.run {
+
+                                val newUser = User(uid, name, age, phone, "")
+
+                                 handleAddNewUser(newUser)
+                            }
+
                             Toast.makeText(context, "Sign up successfully!", Toast.LENGTH_SHORT).show()
                             parentFragmentManager.popBackStack()
                         }else{
@@ -78,6 +95,24 @@ class SignupFragment : Fragment() {
                     }
             }
         }
+    }
+
+    private fun handleAddNewUser(user: User) {
+
+
+        API.apiService.addUser(user).enqueue(object : Callback<ResponseObject<User>> {
+            override fun onResponse(
+                call: Call<ResponseObject<User>>,
+                response: Response<ResponseObject<User>>
+            ) {
+                val user = response.body()?.data as User
+            }
+
+            override fun onFailure(call: Call<ResponseObject<User>>, t: Throwable) {
+                Log.e("tuan", "Fetch fail: ${t.message}")
+            }
+
+        })
     }
 
     private fun initView() {
