@@ -6,13 +6,14 @@ import com.example.securechatapp.ui.home.chatlist.ChatListFragment
 import com.example.securechatapp.ui.home.setting.SettingFragment
 
 class ViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-    override fun getItemCount() = 2
+    override fun getItemCount() = 3
 
     override fun createFragment(position: Int): Fragment {
         return when(position){
-            0 -> ChatListFragment.newInstance()
-            1 -> SettingFragment.newInstance()
-            else -> ChatListFragment.newInstance()
+            0 -> ChatListFragment.newInstance(ChatListFragment.GROUP_TYPE)
+            1 -> ChatListFragment.newInstance(ChatListFragment.USERS_TYPE)
+            2 -> SettingFragment.newInstance()
+            else -> SettingFragment.newInstance()
         }
     }
 }

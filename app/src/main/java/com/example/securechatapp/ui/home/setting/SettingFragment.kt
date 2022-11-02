@@ -9,6 +9,7 @@ import com.example.securechatapp.R
 import com.example.securechatapp.databinding.FragmentSettingBinding
 import com.example.securechatapp.extension.replaceFragment
 import com.example.securechatapp.ui.auth.login.LoginFragment
+import com.example.securechatapp.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -47,6 +48,7 @@ class SettingFragment : Fragment() {
 
     private fun handleSignOut(){
         auth?.signOut()
+        Constant.mUID = ""
 
         parentFragment?.replaceFragment(
             R.id.fragmentContainerView,

@@ -11,6 +11,7 @@ import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.ui.auth.login.LoginFragment
 import com.example.securechatapp.ui.home.HomeFragment
+import com.example.securechatapp.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -60,6 +61,9 @@ class MainActivity : AppCompatActivity() {
                     tag = getString(R.string.login)
                 )
             }else{
+
+                Constant.mUID = currentUser?.uid ?: ""
+
                 addFragment(
                     containerId = getContainerId(),
                     fragment = HomeFragment.newInstance(),

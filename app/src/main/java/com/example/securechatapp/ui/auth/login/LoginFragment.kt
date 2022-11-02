@@ -12,6 +12,7 @@ import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.replaceFragment
 import com.example.securechatapp.ui.auth.signup.SignupFragment
 import com.example.securechatapp.ui.home.HomeFragment
+import com.example.securechatapp.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -72,6 +73,8 @@ class LoginFragment : Fragment() {
                     .addOnCompleteListener{
                         btnLogin.showProgress(false)
                         if(it.isSuccessful){
+                            Constant.mUID = it.result?.user?.uid ?: ""
+
                             Toast.makeText(context, "login successfully!", Toast.LENGTH_SHORT).show()
                             openHomeFragment()
                         }else{
