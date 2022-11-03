@@ -5,11 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.securechatapp.R
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.databinding.LayoutItemRoomBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.extension.toFormattedDate
+import com.squareup.picasso.Picasso
 
 class ChatListAdapter(
     private var mList: MutableList<ChatRoom>
@@ -29,6 +31,11 @@ class ChatListAdapter(
                     tvRoomName.text = item.room.name.decodeBase64()
                     tvTime.text = item.messages.last().time.toFormattedDate()
                     tvRoomLatestMessage.text = item.messages.last().message.decodeBase64()
+
+                    Picasso.get()
+                        .load(item.room.image.decodeBase64())
+                        .placeholder(R.drawable.ic_user_placholder)
+                        .into(ivRoom)
                 }else{
                     tvRoomName.text = item.user.name
                     tvTime.text = item.messages.last().time

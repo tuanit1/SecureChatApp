@@ -2,11 +2,12 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clItem"
     android:layout_width="match_parent"
     android:layout_height="90dp">
 
     <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/ivRoom"
+        android:id="@+id/ivUser"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"
@@ -20,11 +21,10 @@
         app:riv_corner_radius="50dp" />
 
     <TextView
-        android:id="@+id/tvRoomName"
+        android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginEnd="20dp"
         android:layout_marginBottom="5dp"
         android:ellipsize="end"
         android:maxLines="1"
@@ -32,37 +32,36 @@
         android:textColor="@color/amazon"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/tvRoomLatestMessage"
-        app:layout_constraintEnd_toStartOf="@+id/tvTime"
+        app:layout_constraintBottom_toTopOf="@+id/tvPhone"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ivRoom"
+        app:layout_constraintStart_toEndOf="@+id/ivUser"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
-        android:id="@+id/tvRoomLatestMessage"
+        android:id="@+id/tvPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginEnd="30dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="Latest message"
+        android:text="Phone"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/checkBox"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ivRoom"
-        app:layout_constraintTop_toBottomOf="@+id/tvRoomName" />
+        app:layout_constraintStart_toEndOf="@+id/ivUser"
+        app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
-    <TextView
-        android:id="@+id/tvTime"
+    <CheckBox
+        android:id="@+id/checkBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:text="time"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvRoomName"
+        android:layout_marginEnd="10dp"
+        android:buttonTint="@color/greenCrayola"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvRoomName" />
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

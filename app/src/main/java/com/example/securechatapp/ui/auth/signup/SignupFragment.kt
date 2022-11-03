@@ -12,6 +12,7 @@ import com.example.securechatapp.data.api.APIService
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentSignupBinding
+import com.example.securechatapp.extension.encodeBase64
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -76,7 +77,12 @@ class SignupFragment : Fragment() {
                         if(it.isSuccessful){
 
                             it.result.user?.run {
-                                val newUser = User(uid, name, age, phone, "")
+                                val newUser = User(
+                                    uid,
+                                    name.encodeBase64(),
+                                    age.encodeBase64(),
+                                    phone.encodeBase64(),
+                                    "")
                                 handleAddNewUser(newUser)
                             }
                         }else{

@@ -31,8 +31,6 @@ class MainActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        Log.e("tuan", "onCreate")
-
         initListener()
         initView()
     }
@@ -155,8 +153,4 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    override fun onStart() {
-        super.onStart()
-        Log.e("tuan",  "onStart")
-    }
 }

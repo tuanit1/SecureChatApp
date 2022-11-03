@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.databinding.FragmentChatListBinding
+import com.example.securechatapp.extension.addFragment
+import com.example.securechatapp.ui.home.addgroup.AddGroupFragment
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 
@@ -71,6 +73,17 @@ class ChatListFragment : Fragment() {
             mChatRooms.observe(viewLifecycleOwner){ mChatRooms ->
                 mList?.addAll(mChatRooms)
                 mAdapter?.submitList(mList?.toMutableList())
+            }
+        }
+
+        binding?.run {
+            ivAddGroup.setOnClickListener {
+                parentFragment?.addFragment(
+                    R.id.fragmentContainerView,
+                    AddGroupFragment.newInstance(),
+                    true,
+                    AddGroupFragment::class.java.name
+                )
             }
         }
     }

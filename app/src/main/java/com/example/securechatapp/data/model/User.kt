@@ -8,5 +8,6 @@ data class User(
     var name: String,
     var age: String,
     var phone: String,
-    var image: String
+    var image: String,
+    var isSelected: Boolean? = false
 )
