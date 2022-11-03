@@ -47,7 +47,6 @@ class ChatListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initListener()
-
     }
 
     private fun initView() {
@@ -66,6 +65,7 @@ class ChatListFragment : Fragment() {
         val factory = InjectorUtils.provideChatListViewModelFactory()
         mViewModel = ViewModelProvider(this, factory)[ChatListViewModel::class.java]
         mViewModel?.loadRoomList(Constant.mUID)
+        mViewModel?.testLoadList()
     }
 
     private fun initListener() {

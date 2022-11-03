@@ -1,6 +1,7 @@
 package com.example.securechatapp.data.api
 
 import com.example.securechatapp.data.model.*
+import kotlinx.coroutines.Deferred
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -16,8 +17,8 @@ interface APIService {
     fun createPlaylist(@Body body: Map<String, String>): Call<ResponseObject<Unit>>
 
     //ROOM
-    @GET("room/group/{uid}")
-    fun getRoomList(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
+    @GET("room/{type}/{uid}")
+    fun getRoomList(@Path("uid") uid: String, @Path("type") type: String): Call<ResponseObject<MutableList<ChatRoom>>>
 
     @Headers(
         "Content-Type: application/json",
@@ -34,6 +35,9 @@ interface APIService {
     //USER
     @GET("user")
     fun getAllUser(): Call<ResponseObject<MutableList<User>>>
+
+    @GET("user")
+    suspend fun getAwaitAllUser(): ResponseObject<MutableList<User>>
 
     @Headers(
         "Content-Type: application/json",
