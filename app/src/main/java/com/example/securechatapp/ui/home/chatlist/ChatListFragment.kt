@@ -1,10 +1,12 @@
 package com.example.securechatapp.ui.home.chatlist
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -92,14 +94,39 @@ class ChatListFragment : Fragment() {
 
         binding?.run {
             ivAddGroup.setOnClickListener {
+
+                val addGroupFragment = AddGroupFragment.newInstance().apply {
+                    onDoneListener = { isSuccess ->
+                        if(isSuccess){
+                            mViewModel?.loadRoomList(Constant.mUID)
+                        }
+                    }
+                }
+
                 parentFragment?.addFragment(
                     R.id.fragmentContainerView,
-                    AddGroupFragment.newInstance(),
+                    addGroupFragment,
                     true,
                     AddGroupFragment::class.java.name
                 )
             }
         }
     }
+
+//    override fun onResume() {
+//        super.onResume()
+//        Log.e("tuan", "${this.javaClass.name}: onResume")
+//    }
+//
+//    override fun onStart() {
+//        super.onStart()
+//        Log.e("tuan", "${this.javaClass.name}: onStart")
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        Log.e("tuan", "${this.javaClass.name}: onPause")
+//
+//    }
 
 }

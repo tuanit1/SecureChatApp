@@ -65,7 +65,7 @@ class ChatListAdapter(
 
 class RoomDiffCallback : DiffUtil.ItemCallback<ChatRoom>() {
     override fun areItemsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
-        return true
+        return oldItem.room.id == newItem.room.id
     }
 
     override fun areContentsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {

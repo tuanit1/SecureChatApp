@@ -7,21 +7,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentAddGroupBinding
-import com.example.securechatapp.ui.home.chatlist.ChatListViewModel
-import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 
 class AddGroupFragment : Fragment() {
 
+    companion object {
+        fun newInstance() = AddGroupFragment()
+    }
+
+    var onDoneListener: (Boolean) -> Unit = {}
     private var binding: FragmentAddGroupBinding? = null
     private var mViewModel: AddGroupViewModel? = null
-    private var mChatListViewModel: ChatListViewModel? = null
     private var mAdapter: UserListAdapter? = null
     private var mUserList: MutableList<User> = mutableListOf()
 
@@ -39,6 +40,7 @@ class AddGroupFragment : Fragment() {
         initView()
         initListener()
     }
+
 
     private fun initListener() {
 
@@ -60,6 +62,8 @@ class AddGroupFragment : Fragment() {
             if(groupName.isEmpty()){
                 edtGroupName.error = "Please enter group name!"
             }else{
+                binding?.btnProgress?.visibility = View.VISIBLE
+                binding?.tvConfirm?.visibility = View.GONE
                 mViewModel?.addNewGroup(groupName.toString())
             }
         }
@@ -75,7 +79,6 @@ class AddGroupFragment : Fragment() {
         val factory = InjectorUtils.provideAddGroupViewModelFactory()
         val chatFactory = InjectorUtils.provideChatListViewModelFactory()
         mViewModel = ViewModelProvider(this, factory)[AddGroupViewModel::class.java]
-        mChatListViewModel = ViewModelProvider(this, chatFactory)[ChatListViewModel::class.java]
 
         observerUserList()
 
@@ -119,19 +122,36 @@ class AddGroupFragment : Fragment() {
 
             onAddGroupListener = { isSuccess ->
                 if(isSuccess){
+                    onDoneListener(true)
                     Toast.makeText(context, "Group added!", Toast.LENGTH_SHORT).show()
                 }else{
+                    onDoneListener(false)
                     Toast.makeText(context, "Add group failed!", Toast.LENGTH_SHORT).show()
                 }
 
-                mChatListViewModel?.loadRoomList(Constant.mUID)
+                binding?.btnProgress?.visibility = View.GONE
+                binding?.tvConfirm?.visibility = View.VISIBLE
                 parentFragmentManager.popBackStack()
             }
         }
     }
 
-    companion object {
-        fun newInstance() = AddGroupFragment()
-    }
+
+
+//    override fun onResume() {
+//        super.onResume()
+//        Log.e("tuan", "${this.javaClass.name}: onResume")
+//    }
+//
+//    override fun onStart() {
+//        super.onStart()
+//        Log.e("tuan", "${this.javaClass.name}: onStart")
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        Log.e("tuan", "${this.javaClass.name}: onPause")
+//
+//    }
 
 }
