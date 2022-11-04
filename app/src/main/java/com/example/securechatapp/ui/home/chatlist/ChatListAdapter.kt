@@ -1,6 +1,7 @@
 package com.example.securechatapp.ui.home.chatlist
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -29,19 +30,29 @@ class ChatListAdapter(
             binding.run {
                 if(item.room.type == Room.GROUP){
                     tvRoomName.text = item.room.name.decodeBase64()
+
+                    if(item.room.image.decodeBase64().isNotEmpty()){
+                        Picasso.get()
+                            .load(item.room.image.decodeBase64())
+                            .placeholder(R.drawable.ic_user_placholder)
+                            .into(ivRoom)
+                    }
+
+                }else{
+                    tvRoomName.text = item.user.name.decodeBase64()
+                }
+
+                if(item.messages.isNotEmpty()){
                     tvTime.text = item.messages.last().time.toFormattedDate()
                     tvRoomLatestMessage.text = item.messages.last().message.decodeBase64()
-
-                    Picasso.get()
-                        .load(item.room.image.decodeBase64())
-                        .placeholder(R.drawable.ic_user_placholder)
-                        .into(ivRoom)
+                    tvTime.visibility = View.VISIBLE
                 }else{
-                    tvRoomName.text = item.user.name
-                    tvTime.text = item.messages.last().time
-                    tvRoomLatestMessage.text = item.messages.last().message
+                    tvTime.visibility = View.GONE
+                    tvRoomLatestMessage.text = "No message yet"
                 }
+
             }
+
         }
     }
 

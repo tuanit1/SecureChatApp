@@ -1,20 +1,24 @@
 package com.example.securechatapp.ui.home.addgroup
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.User
+import com.example.securechatapp.extension.decodeBase64
+import com.example.securechatapp.extension.encodeBase64
+import com.example.securechatapp.utils.Constant
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Response
-import javax.security.auth.callback.Callback
 
 class AddGroupViewModel: ViewModel() {
     var mUsers: MutableLiveData<MutableList<User>> = MutableLiveData()
     var isLoaded = false
+    var onAddGroupListener: (Boolean) -> Unit = {}
 
     fun loadUserList(callback: APICallback){
 
@@ -28,10 +32,12 @@ class AddGroupViewModel: ViewModel() {
                 response.body()?.let { body ->
                     if (body.success) {
                         body.data?.let { data ->
-                            mUsers.value = data
+                            val filteredList = data.filter { user -> user.uid != Constant.mUID }
+                            mUsers.value = filteredList.toMutableList()
                         }
 
                         isLoaded = true
+
                         callback.onSuccess()
                     } else {
                         Log.e("tuan", "status: false")
@@ -49,11 +55,45 @@ class AddGroupViewModel: ViewModel() {
     }
 
     fun addNewGroup(groupName: String){
-        val selectedList = mUsers.value?.filter { user -> user.isSelected == true }
 
-        selectedList?.forEach { user ->
+        viewModelScope.launch {
+
+            val body = HashMap<String, String>().apply {
+                set("name", groupName.encodeBase64())
+                set("image_ic", "")
+            }
+
+
+            val roomResponse = API.apiService.addRoom(Constant.mUID, body)
+
+            if(roomResponse.success){
+                roomResponse.data?.run {
+
+                    try {
+                        val selectedList = mUsers.value?.filter { user -> user.isSelected == true }
+                        selectedList?.forEach { user ->
+                            API.apiService.addParticipant(user.uid, this.id)
+                            Log.e("tuan", "added participant ${user.name.decodeBase64()}")
+                        }
+
+                        Log.e("tuan", "Done all participant")
+                        onAddGroupListener(true)
+
+
+                    }catch (e: Exception){
+                        Log.e("tuan", "add participant fail")
+                        onAddGroupListener(false)
+                    }
+
+                }
+            }else{
+                Log.e("tuan", "add room failed")
+                onAddGroupListener(false)
+            }
+
 
         }
+
     }
 
     fun checkUser(index: Int, isCheck: Boolean){

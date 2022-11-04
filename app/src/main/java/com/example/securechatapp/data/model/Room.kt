@@ -4,7 +4,7 @@ import com.example.securechatapp.extension.decodeBase64
 import com.google.gson.annotations.SerializedName
 
 data class Room(
-    @SerializedName("room_id")
+    @SerializedName("_id")
     var id: String,
     var name: String,
     @SerializedName("image_ic")

@@ -16,7 +16,7 @@ fun String.decodeBase64(): String{
         e.printStackTrace()
     }
 
-    return text1
+    return text1.trim()
 }
 
 fun String.encodeBase64(): String{
@@ -26,7 +26,7 @@ fun String.encodeBase64(): String{
     } catch (e1: Exception) {
         e1.printStackTrace()
     }
-    return Base64.encodeToString(data, Base64.DEFAULT)
+    return Base64.encodeToString(data, Base64.DEFAULT).trim()
 }
 
 fun String.toFormattedDate(): String{

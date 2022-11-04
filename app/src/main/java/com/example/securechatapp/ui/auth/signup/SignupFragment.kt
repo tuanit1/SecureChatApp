@@ -100,6 +100,8 @@ class SignupFragment : Fragment() {
 
     private fun handleAddNewUser(user: User) {
 
+        Log.e("tuan",user.toString())
+
         API.apiService.addUser(user).enqueue(object : Callback<ResponseObject<User>> {
             override fun onResponse(
                 call: Call<ResponseObject<User>>,

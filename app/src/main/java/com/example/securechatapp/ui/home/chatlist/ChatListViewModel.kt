@@ -5,11 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.API
+import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.data.repository.ChatListRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Call
@@ -20,19 +22,24 @@ class ChatListViewModel(private val repository: ChatListRepository): ViewModel()
 
     var mChatRooms: MutableLiveData<MutableList<ChatRoom>> = MutableLiveData()
 
-    fun loadRoomList(uid: String){
-        repository.getRoomList(uid, Room.GROUP).enqueue(object : Callback<ResponseObject<MutableList<ChatRoom>>>{
+    fun loadRoomList(uid: String, callback: APICallback? = null){
+        callback?.onStart()
+        repository.getRoomList(uid).enqueue(object : Callback<ResponseObject<MutableList<ChatRoom>>>{
             override fun onResponse(
                 call: Call<ResponseObject<MutableList<ChatRoom>>>,
                 response: Response<ResponseObject<MutableList<ChatRoom>>>
             ) {
+
                 response.body()?.let { body ->
                     if (body.success) {
                         body.data?.let { data ->
                             mChatRooms.value = data
                         }
+
+                        callback?.onSuccess()
                     } else {
                         Log.e("tuan", "status: false")
+                        callback?.onError()
                     }
                 }
             }
@@ -42,21 +49,9 @@ class ChatListViewModel(private val repository: ChatListRepository): ViewModel()
                 t: Throwable
             ) {
                 Log.e("tuan", t.message.toString())
+                callback?.onError(t)
             }
-
 
         })
     }
-
-    fun testLoadList(){
-        viewModelScope.launch {
-            val res1 = API.apiService.getAwaitAllUser()
-            val b = res1.success
-
-            if(b){
-                val res2 = API.apiService.getAwaitAllUser()
-            }
-        }
-    }
-
 }

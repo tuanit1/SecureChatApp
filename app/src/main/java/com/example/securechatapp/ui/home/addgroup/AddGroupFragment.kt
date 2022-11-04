@@ -1,23 +1,27 @@
 package com.example.securechatapp.ui.home.addgroup
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentAddGroupBinding
+import com.example.securechatapp.ui.home.chatlist.ChatListViewModel
+import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 
 class AddGroupFragment : Fragment() {
 
     private var binding: FragmentAddGroupBinding? = null
     private var mViewModel: AddGroupViewModel? = null
+    private var mChatListViewModel: ChatListViewModel? = null
     private var mAdapter: UserListAdapter? = null
     private var mUserList: MutableList<User> = mutableListOf()
 
@@ -69,7 +73,9 @@ class AddGroupFragment : Fragment() {
         }
 
         val factory = InjectorUtils.provideAddGroupViewModelFactory()
+        val chatFactory = InjectorUtils.provideChatListViewModelFactory()
         mViewModel = ViewModelProvider(this, factory)[AddGroupViewModel::class.java]
+        mChatListViewModel = ViewModelProvider(this, chatFactory)[ChatListViewModel::class.java]
 
         observerUserList()
 
@@ -109,6 +115,17 @@ class AddGroupFragment : Fragment() {
                 mUserList.clear()
                 mUserList.addAll(list)
                 mAdapter?.submitList(mUserList)
+            }
+
+            onAddGroupListener = { isSuccess ->
+                if(isSuccess){
+                    Toast.makeText(context, "Group added!", Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(context, "Add group failed!", Toast.LENGTH_SHORT).show()
+                }
+
+                mChatListViewModel?.loadRoomList(Constant.mUID)
+                parentFragmentManager.popBackStack()
             }
         }
     }

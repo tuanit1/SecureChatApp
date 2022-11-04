@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
+import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.databinding.FragmentChatListBinding
 import com.example.securechatapp.extension.addFragment
@@ -64,13 +65,26 @@ class ChatListFragment : Fragment() {
 
         val factory = InjectorUtils.provideChatListViewModelFactory()
         mViewModel = ViewModelProvider(this, factory)[ChatListViewModel::class.java]
-        mViewModel?.loadRoomList(Constant.mUID)
-        mViewModel?.testLoadList()
+        mViewModel?.loadRoomList(Constant.mUID, object : APICallback{
+            override fun onStart() {
+                binding?.progressBar?.visibility = View.VISIBLE
+            }
+
+            override fun onSuccess() {
+                binding?.progressBar?.visibility = View.GONE
+            }
+
+            override fun onError(t: Throwable?) {
+                binding?.progressBar?.visibility = View.GONE
+            }
+
+        })
     }
 
     private fun initListener() {
         mViewModel?.run {
             mChatRooms.observe(viewLifecycleOwner){ mChatRooms ->
+                mList?.clear()
                 mList?.addAll(mChatRooms)
                 mAdapter?.submitList(mList?.toMutableList())
             }

@@ -17,32 +17,23 @@ interface APIService {
     fun createPlaylist(@Body body: Map<String, String>): Call<ResponseObject<Unit>>
 
     //ROOM
-    @GET("room/{type}/{uid}")
-    fun getRoomList(@Path("uid") uid: String, @Path("type") type: String): Call<ResponseObject<MutableList<ChatRoom>>>
+    @GET("room/{uid}")
+    fun getRoomList(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
 
     @Headers(
         "Content-Type: application/json",
         "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
     )
-    @POST("participant/{uid}&{roomId}")
-    fun addRoom(
+    @POST("room/{uid}")
+    suspend fun addRoom(
         @Path("uid") uid: String,
-        @Path("roomId") roomId: String,
-        @Body participant: HashMap<String, out Any>
-    ): Call<ResponseObject<User>>
-
+        @Body body: HashMap<String, String>
+    ): ResponseObject<Room>
 
     //USER
     @GET("user")
     fun getAllUser(): Call<ResponseObject<MutableList<User>>>
 
-    @GET("user")
-    suspend fun getAwaitAllUser(): ResponseObject<MutableList<User>>
-
-    @Headers(
-        "Content-Type: application/json",
-        "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
-    )
     @POST("user/")
     fun addUser(@Body user: User): Call<ResponseObject<User>>
 
@@ -52,11 +43,10 @@ interface APIService {
         "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
     )
     @POST("participant/{uid}&{roomId}")
-    fun addParticipant(
+    suspend fun addParticipant(
         @Path("uid") uid: String,
         @Path("roomId") roomId: String,
-        @Body participant: HashMap<String, out Any>
-    ): Call<ResponseObject<User>>
+    ): ResponseObject<Participant>
 
 
 }
