@@ -30,39 +30,59 @@ class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
     ): RecyclerView.ViewHolder(binding.root){
         fun bind(item: ChatRoom){
             binding.run {
-                if(item.room.type == Room.GROUP){
-                    tvRoomName.text = item.room.name.decodeBase64()
 
-                    if(item.room.image.decodeBase64().isNotEmpty()){
-                        Picasso.get()
-                            .load(item.room.image.decodeBase64())
-                            .placeholder(R.drawable.ic_user_placholder)
-                            .into(ivRoom)
+                item.room?.let { room ->
+                    if(room.type == Room.GROUP){
+                        tvRoomName.text = room.name.decodeBase64()
+
+                        if(room.image.decodeBase64().isNotEmpty()){
+                            Picasso.get()
+                                .load(room.image.decodeBase64())
+                                .placeholder(R.drawable.ic_user_placholder)
+                                .into(ivRoom)
+                        }else{
+                            Picasso.get()
+                                .load(R.drawable.ic_user_placholder)
+                                .into(ivRoom)
+                        }
+
+                        ivGroup.visibility = View.VISIBLE
+
                     }else{
-                        Picasso.get()
-                            .load(R.drawable.ic_user_placholder)
-                            .into(ivRoom)
+                        tvRoomName.text = item.participant?.user?.name?.decodeBase64()
+                        ivGroup.visibility = View.GONE
+
+                        item.participant?.user?.let { user ->
+                            if(user.image.decodeBase64().isNotEmpty()){
+                                Picasso.get()
+                                    .load(user.image.decodeBase64())
+                                    .placeholder(R.drawable.ic_user_placholder)
+                                    .into(ivRoom)
+                            }else{
+                                Picasso.get()
+                                    .load(R.drawable.ic_user_placholder)
+                                    .into(ivRoom)
+                            }
+                        }
+
+
                     }
 
-                    ivGroup.visibility = View.VISIBLE
+                    if(item.message != null){
+                        tvTime.text = item.message?.time?.toFormattedDate()
+                        tvRoomLatestMessage.text = item.message?.message?.decodeBase64()
+                        tvTime.visibility = View.VISIBLE
+                    }else{
+                        tvTime.visibility = View.GONE
+                        tvRoomLatestMessage.text = "No message yet"
+                    }
 
-                }else{
-                    tvRoomName.text = item.participant?.user?.name?.decodeBase64()
-                    ivGroup.visibility = View.GONE
+                    clItem.setOnClickListener {
+                        onItemClickListener(room.id)
+                    }
                 }
 
-                if(item.message != null){
-                    tvTime.text = item.message?.time?.toFormattedDate()
-                    tvRoomLatestMessage.text = item.message?.message?.decodeBase64()
-                    tvTime.visibility = View.VISIBLE
-                }else{
-                    tvTime.visibility = View.GONE
-                    tvRoomLatestMessage.text = "No message yet"
-                }
 
-                clItem.setOnClickListener {
-                    onItemClickListener(item.room.id)
-                }
             }
         }
     }

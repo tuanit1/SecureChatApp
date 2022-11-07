@@ -42,7 +42,11 @@ class UserListFragment : Fragment() {
     }
 
     private fun initListener() {
+
         mAdapter?.onItemClickListener = { userId ->
+
+            binding?.progressBar?.visibility = View.VISIBLE
+
             mViewModel?.openPrivateChatScreen(
                 otherUID = userId,
                 callback = { isSuccess, roomID ->
@@ -51,12 +55,14 @@ class UserListFragment : Fragment() {
                     }else{
                         Toast.makeText(context, "Something wrong happened!", Toast.LENGTH_SHORT).show()
                     }
+
+                    binding?.progressBar?.visibility = View.GONE
                 }
             )
         }
     }
 
-    fun openChatListFragment(roomID: String){
+    private fun openChatListFragment(roomID: String){
         parentFragment?.addFragment(
             R.id.fragmentContainerView,
             ChatScreenFragment.newInstance(roomID),
@@ -79,7 +85,7 @@ class UserListFragment : Fragment() {
                 binding?.progressBar?.visibility = View.VISIBLE
             }
 
-            override fun onSuccess() {
+            override fun onSuccess(data: Any?) {
                 binding?.progressBar?.visibility = View.GONE
 
             }

@@ -48,6 +48,9 @@ interface APIService {
     @GET("user")
     fun getAllUser(): Call<ResponseObject<MutableList<User>>>
 
+    @GET("user/{uid}")
+    fun getUserByID(@Path("uid") uid: String): Call<ResponseObject<User>>
+
     @POST("user/")
     fun addUser(@Body user: User): Call<ResponseObject<User>>
 

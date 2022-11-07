@@ -98,7 +98,7 @@ class AddGroupFragment : Fragment() {
                         binding?.progressBar?.visibility = View.VISIBLE
                     }
 
-                    override fun onSuccess() {
+                    override fun onSuccess(data: Any?) {
                         binding?.progressBar?.visibility = View.GONE
                     }
 

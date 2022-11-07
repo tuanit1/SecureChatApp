@@ -21,6 +21,7 @@ class UserListAdapter(): ListAdapter<User, UserListAdapter.ViewHolder>(UserDiffC
         fun bind(item: User){
             binding.run {
                 tvName.text = item.name.decodeBase64()
+                tvPhone.text = item.phone.decodeBase64()
 
                 if(item.image.decodeBase64().isEmpty()){
                     Picasso.get()

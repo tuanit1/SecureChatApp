@@ -16,7 +16,7 @@ class ChatRoomDiffUtil(
     }
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].room.id == newList[newItemPosition].room.id
+        return oldList[oldItemPosition].room?.id == newList[newItemPosition].room?.id
 
     }
 
