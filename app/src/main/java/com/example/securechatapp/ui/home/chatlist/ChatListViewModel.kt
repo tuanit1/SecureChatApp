@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
+import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.data.repository.ChatListRepository
@@ -53,5 +54,22 @@ class ChatListViewModel(private val repository: ChatListRepository): ViewModel()
             }
 
         })
+    }
+
+    fun addMessage(m: Message) {
+
+        mChatRooms.value?.forEach {  chatRoom ->
+            if(chatRoom.room.id == m.roomID){
+
+                val newList = chatRoom.messages.toMutableList().apply {
+                    add(m)
+                }
+
+                chatRoom.messages = newList
+            }
+
+        }
+
+        mChatRooms.postValue(mChatRooms.value)
     }
 }

@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
+import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.databinding.FragmentChatListBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.ui.home.addgroup.AddGroupFragment
+import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 
@@ -24,18 +26,10 @@ class ChatListFragment : Fragment() {
 
     private var binding: FragmentChatListBinding? = null
     private var mViewModel: ChatListViewModel? = null
-    private var mType: String? = null
-    private var mList: MutableList<ChatRoom>? = null
     private var mAdapter: ChatListAdapter? = null
 
     companion object {
-
-        const val GROUP_TYPE = "GROUP_TYPE"
-        const val USERS_TYPE = "USERS_TYPE"
-
-        fun newInstance(type: String) = ChatListFragment().apply {
-            arguments?.putString("type", type)
-        }
+        fun newInstance() = ChatListFragment()
     }
 
     override fun onCreateView(
@@ -53,11 +47,7 @@ class ChatListFragment : Fragment() {
     }
 
     private fun initView() {
-        mType = arguments?.getString("type")
-        mList = mutableListOf()
-        mList?.let { mList ->
-            mAdapter = ChatListAdapter(mList)
-        }
+        mAdapter = ChatListAdapter()
 
         binding?.run {
             rv.adapter = mAdapter
@@ -86,9 +76,7 @@ class ChatListFragment : Fragment() {
     private fun initListener() {
         mViewModel?.run {
             mChatRooms.observe(viewLifecycleOwner){ mChatRooms ->
-                mList?.clear()
-                mList?.addAll(mChatRooms)
-                mAdapter?.submitList(mList?.toMutableList())
+                mAdapter?.setData(mChatRooms)
             }
         }
 
@@ -97,7 +85,7 @@ class ChatListFragment : Fragment() {
 
                 val addGroupFragment = AddGroupFragment.newInstance().apply {
                     onDoneListener = { isSuccess ->
-                        if(isSuccess){
+                        if (isSuccess) {
                             mViewModel?.loadRoomList(Constant.mUID)
                         }
                     }
@@ -111,6 +99,19 @@ class ChatListFragment : Fragment() {
                 )
             }
         }
+
+        mAdapter?.onItemClickListener = { roomId ->
+            parentFragment?.addFragment(
+                R.id.fragmentContainerView,
+                ChatScreenFragment.newInstance(roomId),
+                true,
+                ChatScreenFragment::class.java.name
+            )
+        }
+    }
+
+    fun addMessage(message: Message){
+        mViewModel?.addMessage(message)
     }
 
 //    override fun onResume() {

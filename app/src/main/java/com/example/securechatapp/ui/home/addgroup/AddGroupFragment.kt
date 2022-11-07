@@ -77,7 +77,6 @@ class AddGroupFragment : Fragment() {
         }
 
         val factory = InjectorUtils.provideAddGroupViewModelFactory()
-        val chatFactory = InjectorUtils.provideChatListViewModelFactory()
         mViewModel = ViewModelProvider(this, factory)[AddGroupViewModel::class.java]
 
         observerUserList()

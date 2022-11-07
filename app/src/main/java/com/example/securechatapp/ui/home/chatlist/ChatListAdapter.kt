@@ -12,11 +12,13 @@ import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.databinding.LayoutItemRoomBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.extension.toFormattedDate
+import com.example.securechatapp.utils.ChatRoomDiffUtil
 import com.squareup.picasso.Picasso
 
-class ChatListAdapter(
-    private var mList: MutableList<ChatRoom>
-): ListAdapter<ChatRoom, ChatListAdapter.ViewHolder>(RoomDiffCallback()) {
+class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
+
+    private var mList: List<ChatRoom> = emptyList()
+    var onItemClickListener: (String) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = LayoutItemRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -39,7 +41,7 @@ class ChatListAdapter(
                     }
 
                 }else{
-                    tvRoomName.text = item.user.name.decodeBase64()
+                    tvRoomName.text = item.user?.name?.decodeBase64()
                 }
 
                 if(item.messages.isNotEmpty()){
@@ -51,8 +53,10 @@ class ChatListAdapter(
                     tvRoomLatestMessage.text = "No message yet"
                 }
 
+                clItem.setOnClickListener {
+                    onItemClickListener(item.room.id)
+                }
             }
-
         }
     }
 
@@ -61,15 +65,13 @@ class ChatListAdapter(
     }
 
     override fun getItemCount() = mList.size
-}
 
-class RoomDiffCallback : DiffUtil.ItemCallback<ChatRoom>() {
-    override fun areItemsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
-        return oldItem.room.id == newItem.room.id
-    }
-
-    override fun areContentsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
-        return oldItem == newItem
+    fun setData(newList: List<ChatRoom>){
+        val diffUtil = ChatRoomDiffUtil(mList, newList)
+        val diffResults = DiffUtil.calculateDiff(diffUtil)
+        mList = newList.map { it.copy() }
+        diffResults.dispatchUpdatesTo(this)
     }
 
 }
+

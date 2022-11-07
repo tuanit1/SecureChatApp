@@ -6,16 +6,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
+import com.example.securechatapp.data.model.Participant
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.User
+import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.extension.encodeBase64
 import com.example.securechatapp.utils.Constant
 import kotlinx.coroutines.launch
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 
-class AddGroupViewModel: ViewModel() {
+class AddGroupViewModel(private val repository: UserRepository): ViewModel() {
     var mUsers: MutableLiveData<MutableList<User>> = MutableLiveData()
     var isLoaded = false
     var onAddGroupListener: (Boolean) -> Unit = {}
@@ -24,7 +27,7 @@ class AddGroupViewModel: ViewModel() {
 
         callback.onStart()
 
-        API.apiService.getAllUser().enqueue(object : retrofit2.Callback<ResponseObject<MutableList<User>>>{
+        repository.getAllUser().enqueue(object : retrofit2.Callback<ResponseObject<MutableList<User>>>{
             override fun onResponse(
                 call: Call<ResponseObject<MutableList<User>>>,
                 response: Response<ResponseObject<MutableList<User>>>
@@ -73,9 +76,7 @@ class AddGroupViewModel: ViewModel() {
                         val selectedList = mUsers.value?.filter { user -> user.isSelected == true }
                         selectedList?.forEach { user ->
                             API.apiService.addParticipant(user.uid, this.id)
-                            Log.e("tuan", "added participant ${user.name.decodeBase64()}")
                         }
-
                         Log.e("tuan", "Done all participant")
                         onAddGroupListener(true)
 
@@ -90,8 +91,6 @@ class AddGroupViewModel: ViewModel() {
                 Log.e("tuan", "add room failed")
                 onAddGroupListener(false)
             }
-
-
         }
 
     }
