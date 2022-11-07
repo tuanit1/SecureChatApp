@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso
 class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
 
     private var mList: List<ChatRoom> = emptyList()
-    var onItemClickListener: (String) -> Unit = {}
+    var onItemClickListener: (String?) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = LayoutItemRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -38,15 +38,22 @@ class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
                             .load(item.room.image.decodeBase64())
                             .placeholder(R.drawable.ic_user_placholder)
                             .into(ivRoom)
+                    }else{
+                        Picasso.get()
+                            .load(R.drawable.ic_user_placholder)
+                            .into(ivRoom)
                     }
 
+                    ivGroup.visibility = View.VISIBLE
+
                 }else{
-                    tvRoomName.text = item.user?.name?.decodeBase64()
+                    tvRoomName.text = item.participant?.user?.name?.decodeBase64()
+                    ivGroup.visibility = View.GONE
                 }
 
-                if(item.messages.isNotEmpty()){
-                    tvTime.text = item.messages.last().time.toFormattedDate()
-                    tvRoomLatestMessage.text = item.messages.last().message.decodeBase64()
+                if(item.message != null){
+                    tvTime.text = item.message?.time?.toFormattedDate()
+                    tvRoomLatestMessage.text = item.message?.message?.decodeBase64()
                     tvTime.visibility = View.VISIBLE
                 }else{
                     tvTime.visibility = View.GONE

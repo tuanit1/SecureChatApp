@@ -3,18 +3,11 @@ package com.example.securechatapp.ui.home.chatlist
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.ResponseObject
-import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.data.repository.ChatListRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -56,18 +49,12 @@ class ChatListViewModel(private val repository: ChatListRepository): ViewModel()
         })
     }
 
-    fun addMessage(m: Message) {
+    fun updateLatestMessage(m: Message) {
 
         mChatRooms.value?.forEach {  chatRoom ->
             if(chatRoom.room.id == m.roomID){
-
-                val newList = chatRoom.messages.toMutableList().apply {
-                    add(m)
-                }
-
-                chatRoom.messages = newList
+                chatRoom.message = m
             }
-
         }
 
         mChatRooms.postValue(mChatRooms.value)

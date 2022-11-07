@@ -66,4 +66,16 @@
         app:layout_constraintBottom_toBottomOf="@+id/tvRoomName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvRoomName" />
+
+    <ImageView
+        android:id="@+id/ivGroup"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        app:layout_constraintBottom_toBottomOf="@+id/ivRoom"
+        app:layout_constraintEnd_toEndOf="@+id/ivRoom"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/ivRoom"
+        app:layout_constraintTop_toTopOf="@+id/ivRoom"
+        app:layout_constraintVertical_bias="1.0"
+        android:src="@drawable/ic_group2"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

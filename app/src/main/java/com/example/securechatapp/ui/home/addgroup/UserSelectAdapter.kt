@@ -33,6 +33,7 @@ class UserListAdapter(
                 }else{
                     Picasso.get()
                         .load(item.image.decodeBase64())
+                        .placeholder(R.drawable.ic_user_placholder)
                         .into(ivUser)
                 }
 

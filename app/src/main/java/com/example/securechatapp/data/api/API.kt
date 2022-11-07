@@ -1,5 +1,6 @@
 package com.example.securechatapp.data.api
 
+import com.example.securechatapp.utils.Constant
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -9,7 +10,7 @@ object API {
         get() {
             if (retrofit == null) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl("http://192.168.1.9:8080/api/")
+                    .baseUrl("http://${Constant.SERVER_URL}:8080/api/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
             }

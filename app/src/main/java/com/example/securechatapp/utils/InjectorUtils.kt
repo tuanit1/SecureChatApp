@@ -1,6 +1,7 @@
 package com.example.securechatapp.utils
 
 import com.example.securechatapp.data.repository.ChatListRepository
+import com.example.securechatapp.data.repository.RoomRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.ui.home.addgroup.AddGroupViewModel
 import com.example.securechatapp.ui.home.addgroup.AddGroupViewModelFactory
@@ -19,7 +20,8 @@ object InjectorUtils {
     }
 
     fun provideUserListViewModelFactory(): UserListViewModelFactory {
-        val repository = UserRepository()
-        return UserListViewModelFactory(repository)
+        val userRepository = UserRepository()
+        val roomRepository = RoomRepository()
+        return UserListViewModelFactory(userRepository, roomRepository)
     }
 }

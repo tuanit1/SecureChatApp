@@ -70,12 +70,14 @@ class AddGroupViewModel(private val repository: UserRepository): ViewModel() {
             val roomResponse = API.apiService.addRoom(Constant.mUID, body)
 
             if(roomResponse.success){
-                roomResponse.data?.run {
+                roomResponse.data?.let { room ->
 
                     try {
                         val selectedList = mUsers.value?.filter { user -> user.isSelected == true }
                         selectedList?.forEach { user ->
-                            API.apiService.addParticipant(user.uid, this.id)
+                            room.id?.let {
+                                API.apiService.addParticipant(user.uid, it)
+                            }
                         }
                         Log.e("tuan", "Done all participant")
                         onAddGroupListener(true)

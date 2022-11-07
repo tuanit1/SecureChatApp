@@ -1,18 +1,19 @@
 package com.example.securechatapp.ui.home.userlist
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.databinding.FragmentUserListBinding
-import com.example.securechatapp.ui.home.chatlist.ChatListViewModel
+import com.example.securechatapp.extension.addFragment
+import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.utils.InjectorUtils
 
 class UserListFragment : Fragment() {
@@ -41,7 +42,27 @@ class UserListFragment : Fragment() {
     }
 
     private fun initListener() {
+        mAdapter?.onItemClickListener = { userId ->
+            mViewModel?.openPrivateChatScreen(
+                otherUID = userId,
+                callback = { isSuccess, roomID ->
+                    if(isSuccess){
+                        roomID?.let { openChatListFragment(it) }
+                    }else{
+                        Toast.makeText(context, "Something wrong happened!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
+        }
+    }
 
+    fun openChatListFragment(roomID: String){
+        parentFragment?.addFragment(
+            R.id.fragmentContainerView,
+            ChatScreenFragment.newInstance(roomID),
+            true,
+            ChatScreenFragment::class.java.name
+        )
     }
 
     private fun observeUserList() {
@@ -50,10 +71,6 @@ class UserListFragment : Fragment() {
                 mAdapter?.submitList(list)
             }
         }
-
-
-
-
     }
 
     private fun loadUserList() {

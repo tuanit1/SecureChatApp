@@ -13,6 +13,8 @@ import com.squareup.picasso.Picasso
 
 class UserListAdapter(): ListAdapter<User, UserListAdapter.ViewHolder>(UserDiffCallback()) {
 
+    var onItemClickListener: (String) -> Unit = {}
+
     inner class ViewHolder(
         private val binding: LayoutItemUserBinding
     ): RecyclerView.ViewHolder(binding.root){
@@ -28,6 +30,10 @@ class UserListAdapter(): ListAdapter<User, UserListAdapter.ViewHolder>(UserDiffC
                     Picasso.get()
                         .load(item.image.decodeBase64())
                         .into(ivUser)
+                }
+
+                ivMessage.setOnClickListener {
+                    onItemClickListener(item.uid)
                 }
             }
         }

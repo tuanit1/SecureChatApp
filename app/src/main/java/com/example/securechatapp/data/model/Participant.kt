@@ -5,8 +5,8 @@ import com.google.gson.annotations.SerializedName
 data class Participant(
     @SerializedName("_id")
     var id: String,
-    @SerializedName("user_id")
-    var uid: String,
+    @SerializedName("user")
+    var user: User,
     @SerializedName("room_id")
     var roomID: String,
     var nickname: String,

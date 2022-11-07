@@ -1,18 +1,15 @@
 package com.example.securechatapp.ui.home.chatlist
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
-import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.databinding.FragmentChatListBinding
 import com.example.securechatapp.extension.addFragment
@@ -101,17 +98,21 @@ class ChatListFragment : Fragment() {
         }
 
         mAdapter?.onItemClickListener = { roomId ->
-            parentFragment?.addFragment(
-                R.id.fragmentContainerView,
-                ChatScreenFragment.newInstance(roomId),
-                true,
-                ChatScreenFragment::class.java.name
-            )
+
+            roomId?.let {
+                parentFragment?.addFragment(
+                    R.id.fragmentContainerView,
+                    ChatScreenFragment.newInstance(it),
+                    true,
+                    ChatScreenFragment::class.java.name
+                )
+            }
+
         }
     }
 
     fun addMessage(message: Message){
-        mViewModel?.addMessage(message)
+        mViewModel?.updateLatestMessage(message)
     }
 
 //    override fun onResume() {

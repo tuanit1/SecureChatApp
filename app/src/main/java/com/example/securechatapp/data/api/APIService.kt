@@ -30,6 +30,20 @@ interface APIService {
         @Body body: HashMap<String, String>
     ): ResponseObject<Room>
 
+    @Headers(
+        "Content-Type: application/json",
+        "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
+    )
+    @POST("room/private/{currentUID}&{otherUID}")
+    suspend fun createPrivateRoom(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String): ResponseObject<Room>
+
+    @GET("room/check/{currentUID}&{otherUID}")
+    suspend fun getPrivateRoom(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String): ResponseObject<ChatRoom>
+
+
+    @POST("room/private/{currentUID}&{otherUID}")
+    fun get(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String)
+
     //USER
     @GET("user")
     fun getAllUser(): Call<ResponseObject<MutableList<User>>>
