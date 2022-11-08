@@ -40,9 +40,8 @@ interface APIService {
     @GET("room/check/{currentUID}&{otherUID}")
     suspend fun getPrivateRoom(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String): ResponseObject<ChatRoom>
 
-
-    @POST("room/private/{currentUID}&{otherUID}")
-    fun get(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String)
+    @GET("room/{uid}&{roomID}")
+    fun getRoomByID(@Path("uid") uid: String, @Path("roomID") roomID: String): Call<ResponseObject<ChatRoom>>
 
     //USER
     @GET("user")
@@ -64,6 +63,5 @@ interface APIService {
         @Path("uid") uid: String,
         @Path("roomId") roomId: String,
     ): ResponseObject<Participant>
-
 
 }

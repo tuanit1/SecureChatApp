@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import com.example.securechatapp.R
@@ -27,42 +28,64 @@ class ChatScreenFragment : Fragment() {
         }
     }
 
+    private var isEmptyInput = true
     private var mRoomID: String? = null
-
     private var binding: FragmentChatScreenBinding? = null
+    private var chatListFragment: ChatListFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentChatScreenBinding.inflate(inflater)
-
-        mRoomID = arguments?.getString(ROOM_ID)
-
         return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val frg = parentFragmentManager.findFragmentByTag(HomeFragment::class.java.name) as HomeFragment
-        val chatListFragment = frg.mAdapter?.mFragments?.get(0) as ChatListFragment
+        initView()
+        initListener()
+    }
 
+    private fun initListener() {
         binding?.run {
-            btnSend.setOnClickListener {
-                if(edtMessage.text.isNotEmpty()){
-                    val text = edtMessage.text.toString()
-
-                    mRoomID?.let { mRoomID ->
-                        val message = Message("aaa", text.encodeBase64(), "2022-11-05T02:12:07.937Z", "text", Constant.mUID,
-                            mRoomID
-                        )
-                        chatListFragment.addMessage(message)
-                        parentFragmentManager.popBackStack()
-                    }
+            edtMessage.addTextChangedListener { text ->
+                if(text?.isNotEmpty() == true){
+                    isEmptyInput = true
+                    ivSendMessage.isSelected = true
+                }else{
+                    isEmptyInput = false
+                    ivSendMessage.isSelected = false
                 }
             }
+
         }
+    }
+
+    private fun initView() {
+        mRoomID = arguments?.getString(ROOM_ID)
+        val frg = parentFragmentManager.findFragmentByTag(HomeFragment::class.java.name) as HomeFragment
+        chatListFragment = frg.mAdapter?.mFragments?.get(0) as ChatListFragment
+    }
+
+    private fun handleSendClick(){
+
+//        binding?.run {
+//            if(edtMessage.text.isNotEmpty()){
+//                val text = edtMessage.text.toString()
+//
+//                mRoomID?.let { mRoomID ->
+//                    val message = Message("aaa", text.encodeBase64(), "2022-11-05T02:12:07.937Z", "text", Constant.mUID,
+//                        mRoomID
+//                    )
+//                    chatListFragment?.addMessage(message)
+//                    parentFragmentManager.popBackStack()
+//                }
+//            }
+//        }
+
+
     }
 
 

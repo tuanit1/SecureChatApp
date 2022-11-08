@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Message
@@ -11,10 +12,12 @@ import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.data.repository.ChatListRepository
 import com.example.securechatapp.data.repository.UserRepository
+import com.example.securechatapp.utils.Constant
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.log
 
 class ChatListViewModel(
     private val chatRepository: ChatListRepository,
@@ -87,6 +90,40 @@ class ChatListViewModel(
                     callback.onError(t)
                 }
             })
+        }
+    }
+
+    fun addNewRoomToList(roomID: String){
+        try {
+
+            viewModelScope.launch {
+                API.apiService.getRoomByID(Constant.mUID, roomID).enqueue(object : Callback<ResponseObject<ChatRoom>>{
+                    override fun onResponse(
+                        call: Call<ResponseObject<ChatRoom>>,
+                        response: Response<ResponseObject<ChatRoom>>
+                    ) {
+                        if(response.isSuccessful){
+                            response.body()?.data?.let{ chatRoom ->
+                                mChatRooms.value?.toMutableList()?.apply {
+                                    add(chatRoom)
+                                    mChatRooms.postValue(this)
+                                }
+                            }
+                        }else{
+                            Log.e("tuan", "addNewRoomToList failed")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
+                        Log.e("tuan", "addNewRoomToList failed ${t.message}")
+                    }
+
+                })
+
+            }
+
+        }catch (e: Exception){
+            Log.e("tuan", "addNewRoomToList failed")
         }
     }
 }

@@ -20,7 +20,7 @@ class AddGroupFragment : Fragment() {
         fun newInstance() = AddGroupFragment()
     }
 
-    var onDoneListener: (Boolean) -> Unit = {}
+    var onDoneListener: (Boolean, String?) -> Unit = { _, _ -> }
     private var binding: FragmentAddGroupBinding? = null
     private var mViewModel: AddGroupViewModel? = null
     private var mAdapter: UserListAdapter? = null
@@ -49,7 +49,7 @@ class AddGroupFragment : Fragment() {
                 parentFragmentManager.popBackStack()
             }
 
-            btnConfirm.setOnClickListener{
+            btnConfirm.setOnClickListener {
                 handleConfirmClick()
             }
         }
@@ -59,9 +59,9 @@ class AddGroupFragment : Fragment() {
         binding?.run {
             val groupName = edtGroupName.text
 
-            if(groupName.isEmpty()){
+            if (groupName.isEmpty()) {
                 edtGroupName.error = "Please enter group name!"
-            }else{
+            } else {
                 binding?.btnProgress?.visibility = View.VISIBLE
                 binding?.tvConfirm?.visibility = View.GONE
                 mViewModel?.addNewGroup(groupName.toString())
@@ -92,8 +92,8 @@ class AddGroupFragment : Fragment() {
 
     private fun loadUserList() {
         mViewModel?.run {
-            if(!isLoaded){
-                mViewModel?.loadUserList(object : APICallback{
+            if (!isLoaded) {
+                mViewModel?.loadUserList(object : APICallback {
                     override fun onStart() {
                         binding?.progressBar?.visibility = View.VISIBLE
                     }
@@ -113,18 +113,18 @@ class AddGroupFragment : Fragment() {
 
     private fun observerUserList() {
         mViewModel?.run {
-            mUsers.observe(viewLifecycleOwner){ list ->
+            mUsers.observe(viewLifecycleOwner) { list ->
                 mUserList.clear()
                 mUserList.addAll(list)
                 mAdapter?.submitList(mUserList)
             }
 
-            onAddGroupListener = { isSuccess ->
-                if(isSuccess){
-                    onDoneListener(true)
+            onAddGroupListener = { isSuccess, roomID ->
+                if (isSuccess) {
+                    onDoneListener(true, roomID)
                     Toast.makeText(context, "Group added!", Toast.LENGTH_SHORT).show()
-                }else{
-                    onDoneListener(false)
+                } else {
+                    onDoneListener(false, null)
                     Toast.makeText(context, "Add group failed!", Toast.LENGTH_SHORT).show()
                 }
 
@@ -134,7 +134,6 @@ class AddGroupFragment : Fragment() {
             }
         }
     }
-
 
 
 //    override fun onResume() {

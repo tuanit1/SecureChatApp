@@ -120,9 +120,9 @@ class ChatListFragment : Fragment() {
             ivAddGroup.setOnClickListener {
 
                 val addGroupFragment = AddGroupFragment.newInstance().apply {
-                    onDoneListener = { isSuccess ->
+                    onDoneListener = { isSuccess, roomUID ->
                         if (isSuccess) {
-                            mViewModel?.loadRoomList(Constant.mUID)
+                            roomUID?.let { mViewModel?.addNewRoomToList(roomUID) }
                         }
                     }
                 }
@@ -153,21 +153,5 @@ class ChatListFragment : Fragment() {
     fun addMessage(message: Message){
         mViewModel?.updateLatestMessage(message)
     }
-
-//    override fun onResume() {
-//        super.onResume()
-//        Log.e("tuan", "${this.javaClass.name}: onResume")
-//    }
-//
-//    override fun onStart() {
-//        super.onStart()
-//        Log.e("tuan", "${this.javaClass.name}: onStart")
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        Log.e("tuan", "${this.javaClass.name}: onPause")
-//
-//    }
 
 }

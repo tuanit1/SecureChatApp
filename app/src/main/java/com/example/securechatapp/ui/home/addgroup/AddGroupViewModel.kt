@@ -21,7 +21,7 @@ import retrofit2.Response
 class AddGroupViewModel(private val repository: UserRepository): ViewModel() {
     var mUsers: MutableLiveData<MutableList<User>> = MutableLiveData()
     var isLoaded = false
-    var onAddGroupListener: (Boolean) -> Unit = {}
+    var onAddGroupListener: (Boolean, String?) -> Unit = { _, _ -> }
 
     fun loadUserList(callback: APICallback){
 
@@ -77,21 +77,26 @@ class AddGroupViewModel(private val repository: UserRepository): ViewModel() {
                         selectedList?.forEach { user ->
                             room.id?.let {
                                 API.apiService.addParticipant(user.uid, it)
+                                Log.e("tuan", """
+                                    add Participant:
+                                    + uid: ${user.uid}
+                                    + roomID: ${room.id}
+                                """.trimIndent())
                             }
                         }
                         Log.e("tuan", "Done all participant")
-                        onAddGroupListener(true)
+                        onAddGroupListener(true, room.id)
 
 
                     }catch (e: Exception){
                         Log.e("tuan", "add participant fail")
-                        onAddGroupListener(false)
+                        onAddGroupListener(false, null)
                     }
 
                 }
             }else{
                 Log.e("tuan", "add room failed")
-                onAddGroupListener(false)
+                onAddGroupListener(false, null)
             }
         }
 
