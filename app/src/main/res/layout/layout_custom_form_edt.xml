@@ -37,6 +37,7 @@
             app:boxBackgroundColor="@color/lightGray"
             app:boxStrokeWidth="0dp"
             app:expandedHintEnabled="true"
+            app:endIconTint="@color/amazon"
             app:hintTextColor="@color/amazon"
             app:boxStrokeWidthFocused="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -48,6 +49,7 @@
                 android:id="@+id/edtForm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/black"
                 android:textCursorDrawable="@color/amazon" />
 
         </com.google.android.material.textfield.TextInputLayout>

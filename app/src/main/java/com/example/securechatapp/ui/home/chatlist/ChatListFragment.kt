@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -147,6 +148,24 @@ class ChatListFragment : Fragment() {
                 )
             }
 
+        }
+
+        handleSearchRoom()
+    }
+
+    private fun handleSearchRoom() {
+        binding?.run {
+            edtSearch.addTextChangedListener { text ->
+
+                mViewModel?.mChatRooms?.value?.let {
+                    val filterList = it.filter {  chatRoom ->
+                        chatRoom.room?.name?.decodeBase64()?.lowercase()?.contains(text.toString().lowercase()) == true
+                    }
+
+                    mAdapter?.setData(filterList)
+                }
+
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +14,7 @@ import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.databinding.FragmentUserListBinding
 import com.example.securechatapp.extension.addFragment
+import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.utils.InjectorUtils
 
@@ -60,6 +62,8 @@ class UserListFragment : Fragment() {
                 }
             )
         }
+
+        handleSearchRoom()
     }
 
     private fun openChatListFragment(roomID: String){
@@ -111,6 +115,22 @@ class UserListFragment : Fragment() {
         observeUserList()
         loadUserList()
 
+    }
+
+    private fun handleSearchRoom() {
+        binding?.run {
+            edtSearch.addTextChangedListener { text ->
+
+                mViewModel?.mUsers?.value?.let {
+                    val filterList = it.filter {  user ->
+                        user.name.decodeBase64().lowercase().contains(text.toString().lowercase())
+                    }
+
+                    mAdapter?.submitList(filterList)
+                }
+
+            }
+        }
     }
 
 }

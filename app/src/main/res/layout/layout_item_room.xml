@@ -1,88 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/clItem"
+    android:layout_marginHorizontal="20dp"
     android:layout_width="match_parent"
-    android:layout_height="80dp">
-
-    <com.makeramen.roundedimageview.RoundedImageView
-        android:id="@+id/ivRoom"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="15dp"
-        android:src="@mipmap/ic_launcher"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:riv_corner_radius="50dp" />
-
-    <TextView
-        android:id="@+id/tvRoomName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="5dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="Name"
-        android:textColor="@color/amazon"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/tvRoomLatestMessage"
-        app:layout_constraintEnd_toStartOf="@+id/tvTime"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ivRoom"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <TextView
-        android:id="@+id/tvRoomLatestMessage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="30dp"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:text="Latest message"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ivRoom"
-        app:layout_constraintTop_toBottomOf="@+id/tvRoomName" />
-
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
-        android:text="time"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@+id/tvRoomName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvRoomName" />
-
-    <ImageView
-        android:id="@+id/ivGroup"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/ic_group2"
-        app:layout_constraintBottom_toBottomOf="@+id/ivRoom"
-        app:layout_constraintEnd_toEndOf="@+id/ivRoom"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/ivRoom"
-        app:layout_constraintTop_toTopOf="@+id/ivRoom"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <View
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="15dp"
+    android:layout_marginBottom="10dp"
+    android:layout_height="85dp">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clItem"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginHorizontal="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@color/chineseWhite"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/ivRoom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:src="@mipmap/ic_launcher"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riv_corner_radius="50dp" />
+
+        <TextView
+            android:id="@+id/tvRoomName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="5dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Name"
+            android:textColor="@color/amazon"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tvRoomLatestMessage"
+            app:layout_constraintEnd_toStartOf="@+id/tvTime"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/ivRoom"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <TextView
+            android:id="@+id/tvRoomLatestMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Latest message"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/ivRoom"
+            app:layout_constraintTop_toBottomOf="@+id/tvRoomName" />
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:text="time"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            app:layout_constraintBottom_toBottomOf="@+id/tvRoomName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvRoomName" />
+
+        <ImageView
+            android:id="@+id/ivGroup"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_group2"
+            app:layout_constraintBottom_toBottomOf="@+id/ivRoom"
+            app:layout_constraintEnd_toEndOf="@+id/ivRoom"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/ivRoom"
+            app:layout_constraintTop_toTopOf="@+id/ivRoom"
+            app:layout_constraintVertical_bias="1.0" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
+
