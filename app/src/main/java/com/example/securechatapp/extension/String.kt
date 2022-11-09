@@ -30,15 +30,28 @@ fun String.encodeBase64(): String{
 }
 
 fun String.toFormattedDate(): String{
-    val sdf = SimpleDateFormat("dd/M/yy • hh:mm", Locale.US)
-    val sdfUTC = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
-    val date = sdfUTC.parse(this)
 
-    var timeString = ""
+    return try {
+        val sdf = SimpleDateFormat("dd/M/yy • hh:mm", Locale.US)
+        val sdfUTC = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+        val date = sdfUTC.parse(this)
 
-    date?.let {
-        timeString = sdf.format(date)
+        var timeString = ""
+
+        date?.let {
+            timeString = sdf.format(date)
+        }
+
+        timeString
+    }catch (e: Exception){
+        ""
     }
 
-    return timeString
+}
+
+fun getCurrentFormattedDate(): String{
+    val date = Date()
+    val sdfUTC = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+
+    return sdfUTC.format(date)
 }

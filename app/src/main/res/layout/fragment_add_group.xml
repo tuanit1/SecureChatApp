@@ -11,23 +11,25 @@
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
         android:layout_height="80dp"
-        android:background="@color/greenCrayola"
+        android:layout_marginTop="15dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/edtGroupName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginEnd="40dp"
+            android:layout_marginEnd="20dp"
             android:hint="New group name"
-            android:textColor="@color/white"
-            android:textColorHint="@color/lightGray"
+            android:textColor="@color/amazon"
+            android:textColorHint="@color/gray"
             android:textSize="25sp"
             android:textStyle="bold"
+            android:backgroundTint="@color/gray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/ivCancel"
             app:layout_constraintStart_toStartOf="parent"
@@ -36,16 +38,14 @@
         <ImageView
             android:id="@+id/ivCancel"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="30dp"
+            android:layout_height="30dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="30dp"
             android:src="@drawable/ic_cross_cancel"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/edtGroupName"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintTop_toTopOf="@+id/edtGroupName"
+            app:tint="@color/gray" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

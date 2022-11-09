@@ -56,11 +56,11 @@ class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
                             if(user.image.decodeBase64().isNotEmpty()){
                                 Picasso.get()
                                     .load(user.image.decodeBase64())
-                                    .placeholder(R.drawable.ic_user_placholder)
+                                    .placeholder(R.drawable.ic_user_placeholder2)
                                     .into(ivRoom)
                             }else{
                                 Picasso.get()
-                                    .load(R.drawable.ic_user_placholder)
+                                    .load(R.drawable.ic_user_placeholder2)
                                     .into(ivRoom)
                             }
                         }

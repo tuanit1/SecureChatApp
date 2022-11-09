@@ -13,6 +13,7 @@ import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
 import kotlinx.coroutines.launch
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 
 class UserListViewModel(
@@ -99,5 +100,28 @@ class UserListViewModel(
             }
         }
 
+    }
+
+    fun getCurrentUser(userID: String, callback: APICallback){
+        viewModelScope.launch {
+            userRepository.getUserByID(userID).enqueue(object : Callback<ResponseObject<User>> {
+                override fun onResponse(
+                    call: Call<ResponseObject<User>>,
+                    response: Response<ResponseObject<User>>
+                ) {
+                    if(response.isSuccessful){
+                        response.body()?.data?.let { user ->
+                            callback.onSuccess(user)
+                        }
+                    }else{
+                        callback.onError()
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseObject<User>>, t: Throwable) {
+                    callback.onError(t)
+                }
+            })
+        }
     }
 }

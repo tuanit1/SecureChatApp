@@ -33,7 +33,7 @@ class UserListAdapter(): ListAdapter<User, UserListAdapter.ViewHolder>(UserDiffC
                         .into(ivUser)
                 }
 
-                ivMessage.setOnClickListener {
+                clItem.setOnClickListener {
                     onItemClickListener(item.uid)
                 }
             }

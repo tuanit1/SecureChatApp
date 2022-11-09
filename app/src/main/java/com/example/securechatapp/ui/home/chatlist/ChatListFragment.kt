@@ -101,10 +101,12 @@ class ChatListFragment : Fragment() {
 
             override fun onSuccess(data: Any?) {
                 binding?.progressBar?.visibility = View.GONE
+                binding?.swipeRefreshLayout?.isRefreshing = false
             }
 
             override fun onError(t: Throwable?) {
                 binding?.progressBar?.visibility = View.GONE
+                binding?.swipeRefreshLayout?.isRefreshing = false
             }
 
         })
@@ -150,7 +152,14 @@ class ChatListFragment : Fragment() {
 
         }
 
+        handleRefreshing()
         handleSearchRoom()
+    }
+
+    private fun handleRefreshing() {
+        binding?.swipeRefreshLayout?.setOnRefreshListener {
+            loadList()
+        }
     }
 
     private fun handleSearchRoom() {
@@ -159,7 +168,8 @@ class ChatListFragment : Fragment() {
 
                 mViewModel?.mChatRooms?.value?.let {
                     val filterList = it.filter {  chatRoom ->
-                        chatRoom.room?.name?.decodeBase64()?.lowercase()?.contains(text.toString().lowercase()) == true
+                        chatRoom.room?.name?.decodeBase64()?.lowercase()?.contains(text.toString().lowercase()) == true ||
+                                chatRoom.participant?.user?.name?.decodeBase64()?.lowercase()?.contains(text.toString().lowercase()) == true
                     }
 
                     mAdapter?.setData(filterList)

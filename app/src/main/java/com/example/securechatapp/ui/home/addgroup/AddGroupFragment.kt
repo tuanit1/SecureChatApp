@@ -59,7 +59,7 @@ class AddGroupFragment : Fragment() {
         binding?.run {
             val groupName = edtGroupName.text
 
-            if (groupName.isEmpty()) {
+            if (groupName?.isEmpty() == null) {
                 edtGroupName.error = "Please enter group name!"
             } else {
                 binding?.btnProgress?.visibility = View.VISIBLE
@@ -134,22 +134,5 @@ class AddGroupFragment : Fragment() {
             }
         }
     }
-
-
-//    override fun onResume() {
-//        super.onResume()
-//        Log.e("tuan", "${this.javaClass.name}: onResume")
-//    }
-//
-//    override fun onStart() {
-//        super.onStart()
-//        Log.e("tuan", "${this.javaClass.name}: onStart")
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        Log.e("tuan", "${this.javaClass.name}: onPause")
-//
-//    }
 
 }

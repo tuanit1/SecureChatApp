@@ -1,6 +1,7 @@
 package com.example.securechatapp.ui.home.userlist
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +13,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
+import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentUserListBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
+import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
+import com.squareup.picasso.Picasso
 
 class UserListFragment : Fragment() {
 
@@ -64,6 +68,13 @@ class UserListFragment : Fragment() {
         }
 
         handleSearchRoom()
+        handleRefreshing()
+    }
+
+    private fun handleRefreshing() {
+        binding?.swipeRefreshLayout?.setOnRefreshListener {
+            loadUserList()
+        }
     }
 
     private fun openChatListFragment(roomID: String){
@@ -91,11 +102,14 @@ class UserListFragment : Fragment() {
 
             override fun onSuccess(data: Any?) {
                 binding?.progressBar?.visibility = View.GONE
+                binding?.swipeRefreshLayout?.isRefreshing = false
 
             }
 
             override fun onError(t: Throwable?) {
                 binding?.progressBar?.visibility = View.GONE
+                binding?.swipeRefreshLayout?.isRefreshing = false
+
             }
 
         })
@@ -114,6 +128,7 @@ class UserListFragment : Fragment() {
 
         observeUserList()
         loadUserList()
+        loadUserImage()
 
     }
 
@@ -131,6 +146,35 @@ class UserListFragment : Fragment() {
 
             }
         }
+    }
+
+    private fun loadUserImage() {
+        mViewModel?.getCurrentUser(Constant.mUID, object : APICallback{
+            override fun onStart() = Unit
+
+            override fun onSuccess(data: Any?) {
+                if(data is User){
+
+                    val url = data.image.decodeBase64()
+
+                    if(url.isNotEmpty()){
+                        Picasso.get()
+                            .load(url)
+                            .placeholder(R.drawable.ic_user_placeholder2)
+                            .into(binding?.ivThumb)
+                    }else{
+                        Picasso.get()
+                            .load(R.drawable.ic_user_placeholder2)
+                            .into(binding?.ivThumb)
+                    }
+                }
+            }
+
+            override fun onError(t: Throwable?) {
+                Log.e("tuan", "load user image: ${t?.message}")
+            }
+
+        })
     }
 
 }

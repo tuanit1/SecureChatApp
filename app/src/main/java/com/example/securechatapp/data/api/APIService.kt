@@ -7,15 +7,6 @@ import retrofit2.http.*
 
 interface APIService {
 
-    @GET("playlist/getAll.php")
-    fun getAllPlaylist(): Call<ResponseObject<MutableList<Playlist>>>
-
-    @GET("playlist/getByID.php")
-    fun getPlaylistByID(@Query("id") ID: Int): Call<ResponseObject<Playlist>>
-
-    @HTTP(method = "POST", path = "playlist/create.php", hasBody = true)
-    fun createPlaylist(@Body body: Map<String, String>): Call<ResponseObject<Unit>>
-
     //ROOM
     @GET("room/{uid}")
     fun getRoomList(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
@@ -63,5 +54,9 @@ interface APIService {
         @Path("uid") uid: String,
         @Path("roomId") roomId: String,
     ): ResponseObject<Participant>
+
+    //MESSAGE
+    @GET("message/room/{roomID}")
+    fun getMessagesByRoomID(@Path("roomID") roomID: String): Call<ResponseObject<List<Message>>>
 
 }
