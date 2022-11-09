@@ -91,8 +91,10 @@ class ChatScreenFragment : Fragment() {
     private fun observeMessages() {
         binding?.run {
             mViewModel?.mMessages?.observe(viewLifecycleOwner){ list ->
-                mAdapter?.submitList(list)
-                binding?.rv?.smoothScrollToPosition(list.size - 1)
+                if(list.isNotEmpty()){
+                    mAdapter?.submitList(list)
+                    binding?.rv?.smoothScrollToPosition(list.size - 1)
+                }
             }
         }
     }

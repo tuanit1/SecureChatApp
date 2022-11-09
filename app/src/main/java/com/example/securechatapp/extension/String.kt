@@ -55,3 +55,26 @@ fun getCurrentFormattedDate(): String{
 
     return sdfUTC.format(date)
 }
+
+fun getDiffInMinute(dateString1: String, dateString2: String): Float{
+    val sdfUTC = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+    val date1 = sdfUTC.parse(dateString1)
+    val date2 = sdfUTC.parse(dateString2)
+
+    if(date1 != null && date2 != null){
+        val diff: Long = date1.time - date2.time
+        val seconds = diff / 1000f
+        val minutes = seconds / 60f
+//        val hours = minutes / 60
+//        val days = hours / 24
+
+        return minutes
+    }else{
+        return 0f
+    }
+
+
+
+
+
+}
