@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.securechatapp.data.api.APICallback
+import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.ResponseObject
@@ -23,7 +24,9 @@ class ChatScreenViewModel(
 ): ViewModel() {
 
     var mChatRoom: MutableLiveData<ChatRoom> = MutableLiveData()
-    var mMessages: MutableLiveData<List<Message>> = MutableLiveData()
+    var mMessages: MutableLiveData<List<ChatMessage>> = MutableLiveData()
+    private var mPage = 0
+    private var mStep = 5
 
     fun loadRoom(roomID: String, callback: APICallback){
         callback.onStart()
@@ -51,23 +54,25 @@ class ChatScreenViewModel(
         })
     }
 
-    fun loadMessage(roomID: String, callback: APICallback){
-        messageRepository.getMessagesByRoomID(roomID).enqueue(object : Callback<ResponseObject<List<Message>>>{
+    fun fetchMessage(roomID: String, callback: APICallback){
+        messageRepository.getMessagesByRoomID(roomID, mPage, mStep).enqueue(object : Callback<ResponseObject<List<ChatMessage>>>{
             override fun onResponse(
-                call: Call<ResponseObject<List<Message>>>,
-                response: Response<ResponseObject<List<Message>>>
+                call: Call<ResponseObject<List<ChatMessage>>>,
+                response: Response<ResponseObject<List<ChatMessage>>>
             ) {
                 if(response.isSuccessful && response.body()?.success == true){
                     response.body()?.data?.let { list ->
                         mMessages.postValue(list)
                         callback.onSuccess()
+
+                        mPage++
                     }
                 }else{
                     callback.onError()
                 }
             }
 
-            override fun onFailure(call: Call<ResponseObject<List<Message>>>, t: Throwable) {
+            override fun onFailure(call: Call<ResponseObject<List<ChatMessage>>>, t: Throwable) {
                 callback.onError(t)
             }
 
@@ -75,11 +80,30 @@ class ChatScreenViewModel(
     }
 
     fun sendTextMessage(text: String, roomID: String){
-        val id = UUID.randomUUID().toString()
-        val message = Message(id, text.encodeBase64(), getCurrentFormattedDate(), Message.TEXT, Constant.mUID, roomID)
 
-        val newList = mMessages.value?.toMutableList()?.apply { add(message) }
-        mMessages.postValue(newList?.toList())
+        val body = HashMap<String, String>().apply {
+            set("message", text.encodeBase64())
+            set("type", Message.TEXT)
+        }
+
+        messageRepository.createMessage(Constant.mUID, roomID, body).enqueue(object : Callback<ResponseObject<Message>>{
+            override fun onResponse(
+                call: Call<ResponseObject<Message>>,
+                response: Response<ResponseObject<Message>>
+            ) {
+                if(response.isSuccessful && response.body()?.success == true){
+                    response.body()?.data?.let { message ->
+                        Log.e("tuan", "send message successful ${message.toString()}")
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
+                Log.e("tuan", t.toString())
+            }
+
+        })
+
     }
 
 }

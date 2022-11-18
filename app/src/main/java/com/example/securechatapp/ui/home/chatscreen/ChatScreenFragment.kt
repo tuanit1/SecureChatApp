@@ -10,8 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.Orientation
-import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
@@ -165,7 +163,7 @@ class ChatScreenFragment : Fragment() {
     }
 
     private fun loadMessages() {
-        mRoomID?.let { mViewModel?.loadMessage(it, callback = object : APICallback{
+        mRoomID?.let { mViewModel?.fetchMessage(it, callback = object : APICallback{
             override fun onStart() {
                 binding?.progressBarRV?.visibility = View.VISIBLE
             }

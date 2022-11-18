@@ -56,7 +56,18 @@ interface APIService {
     ): ResponseObject<Participant>
 
     //MESSAGE
-    @GET("message/room/{roomID}")
-    fun getMessagesByRoomID(@Path("roomID") roomID: String): Call<ResponseObject<List<Message>>>
+    @GET("message/page/{roomID}&{page}&{step}")
+    fun getMessagesByRoomID(
+        @Path("roomID") roomID: String,
+        @Path("page") page: Int,
+        @Path("step") step: Int
+    ): Call<ResponseObject<List<ChatMessage>>>
+
+    @POST("message/{uid}&{roomID}")
+    fun createMessage(
+        @Path("uid") uid: String,
+        @Path("roomID") roomID: String,
+        @Body body: HashMap<String, String>
+    ): Call<ResponseObject<Message>>
 
 }
