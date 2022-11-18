@@ -11,13 +11,17 @@ import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.ui.auth.login.LoginFragment
 import com.example.securechatapp.ui.home.HomeFragment
+import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import io.socket.client.IO
+import io.socket.client.Socket
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.net.URISyntaxException
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +34,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding?.root)
 
         auth = Firebase.auth
+
+        AppSocket.getInstance().mSocket.connect()
 
         initListener()
         initView()
@@ -74,7 +80,11 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getContainerId() = R.id.fragmentContainerView
+    override fun onDestroy() {
+        super.onDestroy()
+        AppSocket.getInstance().mSocket.disconnect()
+    }
 
+    private fun getContainerId() = R.id.fragmentContainerView
 
 }

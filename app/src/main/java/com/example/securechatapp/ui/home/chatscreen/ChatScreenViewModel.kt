@@ -25,8 +25,9 @@ class ChatScreenViewModel(
 
     var mChatRoom: MutableLiveData<ChatRoom> = MutableLiveData()
     var mMessages: MutableLiveData<List<ChatMessage>> = MutableLiveData()
+    var isAddToTop: Boolean = false
     private var mPage = 0
-    private var mStep = 5
+    private var mStep = 10
 
     fun loadRoom(roomID: String, callback: APICallback){
         callback.onStart()
@@ -54,29 +55,54 @@ class ChatScreenViewModel(
         })
     }
 
-    fun fetchMessage(roomID: String, callback: APICallback){
+    fun loadMessage(roomID: String, callback: APICallback? = null){
         messageRepository.getMessagesByRoomID(roomID, mPage, mStep).enqueue(object : Callback<ResponseObject<List<ChatMessage>>>{
             override fun onResponse(
                 call: Call<ResponseObject<List<ChatMessage>>>,
                 response: Response<ResponseObject<List<ChatMessage>>>
             ) {
                 if(response.isSuccessful && response.body()?.success == true){
-                    response.body()?.data?.let { list ->
-                        mMessages.postValue(list)
-                        callback.onSuccess()
 
-                        mPage++
+                    response.body()?.data?.let { list ->
+                        if(list.isNotEmpty()){
+                            if(mMessages.value != null){
+                                isAddToTop = true
+                                mMessages.value = mMessages.value?.toMutableList()?.apply {
+                                    addAll(0, list)
+                                }
+
+                            }else{
+                                isAddToTop = false
+                                mMessages.value = list
+                            }
+
+                            callback?.onSuccess()
+                            mPage++
+
+                            Log.e("tuan", "${list.size} more messages added")
+
+                            return
+                        }
                     }
+
+                    callback?.onSuccess()
                 }else{
-                    callback.onError()
+                    callback?.onError()
                 }
             }
 
             override fun onFailure(call: Call<ResponseObject<List<ChatMessage>>>, t: Throwable) {
-                callback.onError(t)
+                callback?.onError(t)
             }
 
         })
+    }
+
+    fun addIncomingMessage(chatMessage: ChatMessage){
+        isAddToTop = false
+        mMessages.value = mMessages.value?.toMutableList()?.apply {
+            add(chatMessage)
+        }
     }
 
     fun sendTextMessage(text: String, roomID: String){

@@ -75,7 +75,6 @@ class ChatScreenAdapter() :
                         tvNameSender.text = chatMessage.participant.user.name.decodeBase64()
                     }
 
-
                     val url = chatMessage.participant.user.image.decodeBase64()
                     if(url.isNotEmpty()){
                         Picasso.get()
@@ -90,7 +89,6 @@ class ChatScreenAdapter() :
 
                 }
             }
-
 
         }
 

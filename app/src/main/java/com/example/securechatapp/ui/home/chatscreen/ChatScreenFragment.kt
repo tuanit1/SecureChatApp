@@ -1,6 +1,7 @@
 package com.example.securechatapp.ui.home.chatscreen
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
@@ -17,6 +19,7 @@ import com.example.securechatapp.databinding.FragmentChatScreenBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
+import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.InjectorUtils
 import com.squareup.picasso.Picasso
 
@@ -80,6 +83,24 @@ class ChatScreenFragment : Fragment() {
                 }
             }
 
+            rv.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+
+                    if(newState == RecyclerView.SCROLL_STATE_IDLE && !recyclerView.canScrollVertically(-1)){
+                        mRoomID?.let{ mViewModel?.loadMessage(it) }
+                    }
+                }
+            })
+
+        }
+
+        AppSocket.getInstance().onListenMessage = {
+            if(it.message.roomID == mRoomID){
+                activity?.runOnUiThread{
+                    mViewModel?.addIncomingMessage(it)
+                }
+            }
         }
 
         observeRoom()
@@ -89,9 +110,13 @@ class ChatScreenFragment : Fragment() {
     private fun observeMessages() {
         binding?.run {
             mViewModel?.mMessages?.observe(viewLifecycleOwner){ list ->
-                if(list.isNotEmpty()){
+                if(list?.isNotEmpty() == true){
                     mAdapter?.submitList(list)
-                    binding?.rv?.smoothScrollToPosition(list.size - 1)
+
+                    if(mViewModel?.isAddToTop == false){
+                        binding?.rv?.smoothScrollToPosition(list.size - 1)
+                    }
+
                 }
             }
         }
@@ -163,7 +188,7 @@ class ChatScreenFragment : Fragment() {
     }
 
     private fun loadMessages() {
-        mRoomID?.let { mViewModel?.fetchMessage(it, callback = object : APICallback{
+        mRoomID?.let { mViewModel?.loadMessage(it, callback = object : APICallback{
             override fun onStart() {
                 binding?.progressBarRV?.visibility = View.VISIBLE
             }
