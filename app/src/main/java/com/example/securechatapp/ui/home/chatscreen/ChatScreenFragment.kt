@@ -73,8 +73,8 @@ class ChatScreenFragment : Fragment() {
         (activity as MainActivity).run {
             onActivityResultListener = {
                 when(resultCode){
-                    PICK_IMAGE_REQUEST -> {}
-                    PICK_FILE_REQUEST -> {}
+                    PICK_IMAGE_REQUEST -> { onPickPhotoResult(it) }
+                    PICK_FILE_REQUEST -> { onPickFileResult(it) }
                     TAKE_PHOTO_REQUEST -> { onTakePhotoResult(it) }
                 }
             }
@@ -102,7 +102,10 @@ class ChatScreenFragment : Fragment() {
             ivSendMessage.setOnClickListener {
                 if(!isEmptyInput){
                     mRoomID?.let {
-                        mViewModel?.sendTextMessage(edtMessage.text.toString(), it)
+                        progressBarMsg.visibility = View.VISIBLE
+                        mViewModel?.sendTextMessage(edtMessage.text.toString(), it){
+                            progressBarMsg.visibility = View.GONE
+                        }
                         edtMessage.text.clear()
                     }
                 }else{
@@ -125,6 +128,15 @@ class ChatScreenFragment : Fragment() {
                     checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE){
                         resultCode = PICK_IMAGE_REQUEST
                         pickImageFromGallery()
+                    }
+                }
+            }
+
+            btnPickFile.setOnClickListener{
+                (activity as MainActivity).run{
+                    checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE){
+                        resultCode = PICK_FILE_REQUEST
+                        pickFileFromStorage()
                     }
                 }
             }
@@ -279,14 +291,56 @@ class ChatScreenFragment : Fragment() {
 
         val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
         val imageRef = FirebaseStorage.getInstance().reference.child(path)
+
+        binding?.progressBarMsg?.visibility = View.VISIBLE
+
         imageRef.putBytes(byteArray).addOnFailureListener{
             Log.e("tuan", it.message.toString())
+            binding?.progressBarMsg?.visibility = View.GONE
         }.addOnSuccessListener {
             imageRef.downloadUrl.addOnCompleteListener {
-                val a = it.result
+                val downloadUrl = it.result.toString()
+                mRoomID?.let { roomId ->
+                    binding?.progressBarMsg?.visibility = View.VISIBLE
+                    mViewModel?.sendImageMessage(downloadUrl, roomId){
+                        binding?.progressBarMsg?.visibility = View.GONE
+                    }
+                }
+            }.addOnFailureListener {
+                binding?.progressBarMsg?.visibility = View.GONE
             }
         }
 
+    }
+
+    private fun onPickPhotoResult(data: Intent){
+        val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
+        val imageRef = FirebaseStorage.getInstance().reference.child(path)
+
+        binding?.progressBarMsg?.visibility = View.VISIBLE
+
+        data.data?.let { uri ->
+            imageRef.putFile(uri).addOnFailureListener{
+                Log.e("tuan", it.message.toString())
+                binding?.progressBarMsg?.visibility = View.GONE
+            }.addOnSuccessListener {
+                imageRef.downloadUrl.addOnCompleteListener {
+                    val downloadUrl = it.result.toString()
+                    mRoomID?.let { roomId ->
+                        binding?.progressBarMsg?.visibility = View.VISIBLE
+                        mViewModel?.sendImageMessage(downloadUrl, roomId){
+                            binding?.progressBarMsg?.visibility = View.GONE
+                        }
+                    }
+                }.addOnFailureListener {
+                    binding?.progressBarMsg?.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun onPickFileResult(data: Intent){
+        val a = data.data
     }
 
     private fun handleSendClick(){

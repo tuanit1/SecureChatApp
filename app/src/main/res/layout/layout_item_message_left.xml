@@ -5,22 +5,37 @@
     android:layout_height="wrap_content"
     android:id="@+id/clItem">
 
-    <TextView
-        android:id="@+id/tvMessageContent"
+<!--    message-->
+    <RelativeLayout
+        android:id="@+id/rlMessageContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
-        android:background="@drawable/bg_message_left"
-        android:maxWidth="300dp"
-        android:paddingHorizontal="10dp"
-        android:paddingVertical="10dp"
-        android:text="text"
-        android:textColor="@color/amazon"
-        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/ivUserThumb" />
+        app:layout_constraintStart_toEndOf="@+id/ivUserThumb" >
+        <TextView
+            android:id="@+id/tvMessageContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_message_left"
+            android:maxWidth="280dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="10dp"
+            android:text=""
+            android:textColor="@color/amazon"
+            android:textSize="15sp"/>
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/ivMessage"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            app:riv_corner_radius="10dp"
+            android:visibility="gone"
+            android:src="@drawable/splashart_signup"
+            android:adjustViewBounds="true"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tvMessageTime"
@@ -43,10 +58,10 @@
         android:layout_marginStart="15dp"
         android:src="@drawable/ic_user_placholder"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@+id/tvMessageContent"
+        app:layout_constraintBottom_toBottomOf="@+id/rlMessageContent"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvMessageContent"
+        app:layout_constraintTop_toTopOf="@+id/rlMessageContent"
         app:layout_constraintVertical_bias="1.0"
         app:riv_corner_radius="100dp" />
 
@@ -61,9 +76,9 @@
         android:text="name"
         android:textColor="@color/amazon"
         android:textSize="13sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvMessageContent"
+        app:layout_constraintBottom_toTopOf="@+id/rlMessageContent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/tvMessageContent" />
+        app:layout_constraintStart_toStartOf="@+id/rlMessageContent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -69,10 +69,34 @@ class ChatScreenAdapter() :
                             }
                         }
 
-                        tvMessageContent.text = item.message.decodeBase64()
                         tvMessageTime.text = item.time.toFormattedDate()
                         tvNameSender.text = item.uid
                         tvNameSender.text = chatMessage.participant.user.name.decodeBase64()
+
+                        when(chatMessage.message.type){
+                            Message.TEXT -> {
+                                ivMessage.visibility = View.GONE
+                                tvMessageContent.visibility = View.VISIBLE
+                                tvMessageContent.text = item.message.decodeBase64()
+                            }
+
+                            Message.IMAGE -> {
+                                ivMessage.visibility = View.VISIBLE
+                                tvMessageContent.visibility = View.GONE
+
+                                val urlImage = item.message.decodeBase64()
+                                if(urlImage.isNotEmpty()){
+                                    Picasso.get()
+                                        .load(urlImage)
+                                        .placeholder(R.drawable.img_photo_placeholder)
+                                        .into(ivMessage)
+                                }else{
+                                    Picasso.get()
+                                        .load(R.drawable.img_photo_placeholder)
+                                        .into(ivMessage)
+                                }
+                            }
+                        }
                     }
 
                     val url = chatMessage.participant.user.image.decodeBase64()
@@ -101,8 +125,31 @@ class ChatScreenAdapter() :
                 setItemLayoutParams(layoutParam)
 
                 chatMessage.message.let { item ->
-                    tvMessageContent.text = item.message.decodeBase64()
                     tvMessageTime.text = item.time.decodeBase64().toFormattedDate()
+                    when(chatMessage.message.type){
+                        Message.TEXT -> {
+                            ivMessage.visibility = View.GONE
+                            tvMessageContent.visibility = View.VISIBLE
+                            tvMessageContent.text = item.message.decodeBase64()
+                        }
+
+                        Message.IMAGE -> {
+                            ivMessage.visibility = View.VISIBLE
+                            tvMessageContent.visibility = View.GONE
+
+                            val urlImage = item.message.decodeBase64()
+                            if(urlImage.isNotEmpty()){
+                                Picasso.get()
+                                    .load(urlImage)
+                                    .placeholder(R.drawable.img_photo_placeholder)
+                                    .into(ivMessage)
+                            }else{
+                                Picasso.get()
+                                    .load(R.drawable.img_photo_placeholder)
+                                    .into(ivMessage)
+                            }
+                        }
+                    }
                 }
 
             }
@@ -111,7 +158,7 @@ class ChatScreenAdapter() :
         private fun setItemLayoutParams(layoutParam: RecyclerView.LayoutParams) {
             val dim5dp = itemView.context.resources.getDimension(R.dimen._5dp).toInt()
             val dim10dp = itemView.context.resources.getDimension(R.dimen._10dp).toInt()
-            val dim20dp = itemView.context.resources.getDimension(R.dimen._20dp).toInt()
+            val dim15dp = itemView.context.resources.getDimension(R.dimen._15dp).toInt()
             layoutParam.run {
 
                 if(adapterPosition == 0){
@@ -125,7 +172,7 @@ class ChatScreenAdapter() :
                     topMargin = if(diffMin < 1){
                         dim5dp
                     }else{
-                        dim20dp
+                        dim15dp
                     }
                 }
 

@@ -131,6 +131,12 @@ class MainActivity : AppCompatActivity() {
         resultLauncher.launch(intent)
     }
 
+    fun pickFileFromStorage() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "*/*"
+        resultLauncher.launch(intent)
+    }
+
     fun getImageFromCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         resultLauncher.launch(intent)

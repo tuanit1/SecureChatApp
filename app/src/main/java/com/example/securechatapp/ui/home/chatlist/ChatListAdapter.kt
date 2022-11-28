@@ -64,8 +64,6 @@ class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
                                     .into(ivRoom)
                             }
                         }
-
-
                     }
 
                     if(item.message != null){
@@ -74,15 +72,13 @@ class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
                         tvTime.visibility = View.VISIBLE
                     }else{
                         tvTime.visibility = View.GONE
-                        tvRoomLatestMessage.text = "No message yet"
+                        tvRoomLatestMessage.text = itemView.context.getString(R.string.no_message_yet)
                     }
 
                     clItem.setOnClickListener {
                         onItemClickListener(room.id)
                     }
                 }
-
-
             }
         }
     }

@@ -253,13 +253,12 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/view"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/progressBarMsg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ProgressBar
                 android:id="@+id/progressBarRV"
@@ -273,6 +272,19 @@
                 app:layout_constraintEnd_toEndOf="@+id/rv"
                 app:layout_constraintStart_toStartOf="@+id/rv"
                 app:layout_constraintTop_toTopOf="@+id/rv" />
+
+            <ProgressBar
+                android:id="@+id/progressBarMsg"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="5dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/greenCrayola"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/view"
+                app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

@@ -16,5 +16,6 @@ data class Message(
 ){
     companion object{
         const val TEXT = "text"
+        const val IMAGE = "image"
     }
 }
