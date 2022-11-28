@@ -1,5 +1,8 @@
 package com.example.securechatapp.ui.home.chatscreen
 
+import android.Manifest
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.securechatapp.MainActivity
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
@@ -21,13 +25,19 @@ import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
 import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.InjectorUtils
+import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
+import java.io.ByteArrayOutputStream
 
 
 class ChatScreenFragment : Fragment() {
 
     companion object {
         const val ROOM_ID = "room_id"
+        const val PICK_IMAGE_REQUEST = "PICK_IMAGE_REQUEST"
+        const val TAKE_PHOTO_REQUEST = "TAKE_PHOTO_REQUEST"
+        const val PICK_FILE_REQUEST = "PICK_FILE_REQUEST"
+
         fun newInstance(roomId: String) = ChatScreenFragment().apply {
             arguments = Bundle().apply {
                 putString(ROOM_ID, roomId)
@@ -41,6 +51,7 @@ class ChatScreenFragment : Fragment() {
     private var chatListFragment: ChatListFragment? = null
     private var mViewModel: ChatScreenViewModel? = null
     private var mAdapter: ChatScreenAdapter? = null
+    private var resultCode: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,8 +69,23 @@ class ChatScreenFragment : Fragment() {
     }
 
     private fun initListener() {
+
+        (activity as MainActivity).run {
+            onActivityResultListener = {
+                when(resultCode){
+                    PICK_IMAGE_REQUEST -> {}
+                    PICK_FILE_REQUEST -> {}
+                    TAKE_PHOTO_REQUEST -> { onTakePhotoResult(it) }
+                }
+            }
+        }
+
         binding?.run {
             edtMessage.addTextChangedListener { text ->
+
+                ivSendMessage.visibility = View.VISIBLE
+                llSendMore.visibility = View.GONE
+
                 if(text?.isNotEmpty() == true){
                     isEmptyInput = false
                     ivSendMessage.isSelected = true
@@ -74,14 +100,35 @@ class ChatScreenFragment : Fragment() {
             }
 
             ivSendMessage.setOnClickListener {
-                val b = isEmptyInput
                 if(!isEmptyInput){
                     mRoomID?.let {
                         mViewModel?.sendTextMessage(edtMessage.text.toString(), it)
                         edtMessage.text.clear()
                     }
+                }else{
+                    llSendMore.visibility = View.VISIBLE
+                    ivSendMessage.visibility = View.GONE
                 }
             }
+
+            btnTakePhoto.setOnClickListener{
+                (activity as MainActivity).run{
+                    checkUserPermission(Manifest.permission.CAMERA){
+                        resultCode = TAKE_PHOTO_REQUEST
+                        getImageFromCamera()
+                    }
+                }
+            }
+
+            btnPickPhoto.setOnClickListener {
+                (activity as MainActivity).run{
+                    checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE){
+                        resultCode = PICK_IMAGE_REQUEST
+                        pickImageFromGallery()
+                    }
+                }
+            }
+
 
             rv.addOnScrollListener(object: RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -222,6 +269,24 @@ class ChatScreenFragment : Fragment() {
                 binding?.clTitle?.visibility = View.VISIBLE
             }
         }) }
+    }
+
+    private fun onTakePhotoResult(data: Intent){
+        val bitmap = data.extras?.get("data") as Bitmap
+        val os = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+        val byteArray = os.toByteArray()
+
+        val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
+        val imageRef = FirebaseStorage.getInstance().reference.child(path)
+        imageRef.putBytes(byteArray).addOnFailureListener{
+            Log.e("tuan", it.message.toString())
+        }.addOnSuccessListener {
+            imageRef.downloadUrl.addOnCompleteListener {
+                val a = it.result
+            }
+        }
+
     }
 
     private fun handleSendClick(){

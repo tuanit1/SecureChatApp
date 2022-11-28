@@ -16,4 +16,5 @@
     <string name="users">Users</string>
     <string name="rooms">Rooms</string>
     <string name="setting">Setting</string>
+    <string name="type_here">Type here</string>
 </resources>

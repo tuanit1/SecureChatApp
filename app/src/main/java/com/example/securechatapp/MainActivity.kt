@@ -1,9 +1,20 @@
 package com.example.securechatapp
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.model.Playlist
 import com.example.securechatapp.data.model.ResponseObject
@@ -18,15 +29,19 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import io.socket.client.IO
 import io.socket.client.Socket
+import kotlinx.coroutines.runBlocking
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.net.URISyntaxException
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null
     private var auth: FirebaseAuth? = null
+    private var onPermissionGranted: () -> Unit = {}
+    var onActivityResultListener : (data: Intent) -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,9 +60,9 @@ class MainActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val count = supportFragmentManager.backStackEntryCount
-                if(count > 1){
+                if (count > 1) {
                     supportFragmentManager.popBackStack()
-                }else{
+                } else {
                     finish()
                 }
             }
@@ -57,14 +72,14 @@ class MainActivity : AppCompatActivity() {
     private fun initView() {
 
         auth?.run {
-            if(currentUser == null){
+            if (currentUser == null) {
                 addFragment(
                     containerId = getContainerId(),
                     fragment = LoginFragment.newInstance(),
                     addToBackStack = true,
                     tag = getString(R.string.login)
                 )
-            }else{
+            } else {
 
                 Constant.mUID = currentUser?.uid ?: ""
 
@@ -76,9 +91,51 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-
-
     }
+
+    fun checkUserPermission(permission: String, onGranted: () -> Unit) {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(this, permission) -> {
+                onGranted()
+            }
+            else -> {
+                onPermissionGranted = { onGranted() }
+                requestPermissionLauncher.launch(permission)
+            }
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            onPermissionGranted()
+        }
+    }
+
+    private var resultLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.let {
+                    onActivityResultListener(it)
+                }
+            }
+        }
+
+    @SuppressLint("IntentReset")
+    fun pickImageFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        resultLauncher.launch(intent)
+    }
+
+    fun getImageFromCamera() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        resultLauncher.launch(intent)
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
