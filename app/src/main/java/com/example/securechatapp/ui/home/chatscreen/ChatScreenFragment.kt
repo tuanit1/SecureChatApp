@@ -319,7 +319,7 @@ class ChatScreenFragment : Fragment() {
                 val downloadUrl = it.result.toString()
                 mRoomID?.let { roomId ->
                     binding?.progressBarMsg?.visibility = View.VISIBLE
-                    mViewModel?.sendImageMessage(downloadUrl, roomId, true) {
+                    mViewModel?.sendFileMessage(downloadUrl, roomId, true) {
                         binding?.progressBarMsg?.visibility = View.GONE
                     }
                 }
@@ -350,7 +350,7 @@ class ChatScreenFragment : Fragment() {
                             val downloadUrl = it.result.toString()
                             mRoomID?.let { roomId ->
                                 binding?.progressBarMsg?.visibility = View.VISIBLE
-                                mViewModel?.sendImageMessage(downloadUrl, roomId, true) {
+                                mViewModel?.sendFileMessage(downloadUrl, roomId, true) {
                                     binding?.progressBarMsg?.visibility = View.GONE
                                 }
                             }
@@ -380,7 +380,7 @@ class ChatScreenFragment : Fragment() {
                             val downloadUrl = it.result.toString()
                             mRoomID?.let { roomId ->
                                 binding?.progressBarMsg?.visibility = View.VISIBLE
-                                mViewModel?.sendImageMessage(downloadUrl, roomId, false) {
+                                mViewModel?.sendFileMessage(downloadUrl, roomId, false) {
                                     binding?.progressBarMsg?.visibility = View.GONE
                                 }
                             }

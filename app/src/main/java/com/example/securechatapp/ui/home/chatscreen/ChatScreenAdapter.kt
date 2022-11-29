@@ -49,25 +49,25 @@ class ChatScreenAdapter() :
 
                     chatMessage.message.let { item ->
 
-                        if(adapterPosition < currentList.size - 1){
-                            val nextItem = getItem(adapterPosition + 1)
-                            val diffMin = getDiffInMinute(nextItem.message.time, item.time)
-                            if (nextItem.message.uid == item.uid && diffMin < 1) {
-                                ivUserThumb.visibility = View.INVISIBLE
-                            }
-                        }
+//                        if(adapterPosition < currentList.size - 1){
+//                            val nextItem = getItem(adapterPosition + 1)
+//                            val diffMin = getDiffInMinute(nextItem.message.time, item.time)
+//                            if (nextItem.message.uid == item.uid && diffMin < 1) {
+//                                ivUserThumb.visibility = View.INVISIBLE
+//                            }
+//                        }
 
-                        if (adapterPosition > 0 && adapterPosition < currentList.size) {
-                            val prevItem = getItem(adapterPosition - 1)
-
-                            val diffMin = getDiffInMinute(item.time, prevItem.message.time)
-
-                            if(diffMin <= 1){
-                                if (prevItem.message.uid == item.uid) {
-                                    tvNameSender.visibility = View.GONE
-                                }
-                            }
-                        }
+//                        if (adapterPosition > 0 && adapterPosition < currentList.size) {
+//                            val prevItem = getItem(adapterPosition - 1)
+//
+//                            val diffMin = getDiffInMinute(item.time, prevItem.message.time)
+//
+//                            if(diffMin <= 1){
+//                                if (prevItem.message.uid == item.uid) {
+//                                    tvNameSender.visibility = View.GONE
+//                                }
+//                            }
+//                        }
 
                         tvMessageTime.text = item.time.toFormattedDate()
                         tvNameSender.text = item.uid
@@ -156,9 +156,9 @@ class ChatScreenAdapter() :
         }
 
         private fun setItemLayoutParams(layoutParam: RecyclerView.LayoutParams) {
-            val dim5dp = itemView.context.resources.getDimension(R.dimen._5dp).toInt()
+            val dim2dp = itemView.context.resources.getDimension(R.dimen._2dp).toInt()
             val dim10dp = itemView.context.resources.getDimension(R.dimen._10dp).toInt()
-            val dim15dp = itemView.context.resources.getDimension(R.dimen._15dp).toInt()
+
             layoutParam.run {
 
                 if(adapterPosition == 0){
@@ -170,9 +170,9 @@ class ChatScreenAdapter() :
                     )
 
                     topMargin = if(diffMin < 1){
-                        dim5dp
+                        dim2dp
                     }else{
-                        dim15dp
+                        dim10dp
                     }
                 }
 
