@@ -140,10 +140,10 @@ class ChatScreenViewModel(
 
     }
 
-    fun sendImageMessage(url: String, roomID: String, onFinish: () -> Unit){
+    fun sendImageMessage(url: String, roomID: String, isImage: Boolean, onFinish: () -> Unit) {
         val body = HashMap<String, String>().apply {
             set("message", url.encodeBase64())
-            set("type", Message.IMAGE)
+            set("type", if (isImage) Message.IMAGE else Message.FILE)
         }
 
 
