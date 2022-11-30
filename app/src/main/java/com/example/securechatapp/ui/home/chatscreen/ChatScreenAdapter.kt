@@ -3,8 +3,6 @@ package com.example.securechatapp.ui.home.chatscreen
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.marginTop
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -20,13 +18,14 @@ import com.example.securechatapp.extension.toFormattedDate
 import com.example.securechatapp.utils.Constant
 import com.squareup.picasso.Picasso
 
-class ChatScreenAdapter() :
-    ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(ChatMessageDiffCallback()) {
+class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(ChatMessageDiffCallback()) {
 
     companion object {
         const val LEFT_MESSAGE = 1
         const val RIGHT_MESSAGE = 2
     }
+
+    var onDownloadClickListener: (String) -> Unit = {}
 
     inner class ViewHolder(
         private val mBinding: ViewBinding
@@ -48,27 +47,6 @@ class ChatScreenAdapter() :
                     setItemLayoutParams(layoutParam)
 
                     chatMessage.message.let { item ->
-
-//                        if(adapterPosition < currentList.size - 1){
-//                            val nextItem = getItem(adapterPosition + 1)
-//                            val diffMin = getDiffInMinute(nextItem.message.time, item.time)
-//                            if (nextItem.message.uid == item.uid && diffMin < 1) {
-//                                ivUserThumb.visibility = View.INVISIBLE
-//                            }
-//                        }
-
-//                        if (adapterPosition > 0 && adapterPosition < currentList.size) {
-//                            val prevItem = getItem(adapterPosition - 1)
-//
-//                            val diffMin = getDiffInMinute(item.time, prevItem.message.time)
-//
-//                            if(diffMin <= 1){
-//                                if (prevItem.message.uid == item.uid) {
-//                                    tvNameSender.visibility = View.GONE
-//                                }
-//                            }
-//                        }
-
                         tvMessageTime.text = item.time.toFormattedDate()
                         tvNameSender.text = item.uid
                         tvNameSender.text = chatMessage.participant.user.name.decodeBase64()
@@ -94,6 +72,17 @@ class ChatScreenAdapter() :
                                     Picasso.get()
                                         .load(R.drawable.img_photo_placeholder)
                                         .into(ivMessage)
+                                }
+                            }
+
+                            Message.FILE -> {
+                                layoutFile.root.visibility = View.VISIBLE
+                                tvMessageContent.visibility = View.GONE
+                                ivMessage.visibility = View.GONE
+
+                                layoutFile.tvFileName.text = item.message.decodeBase64()
+                                layoutFile.ivDownload.setOnClickListener {
+                                    onDownloadClickListener(item.message.decodeBase64())
                                 }
                             }
                         }
@@ -129,6 +118,7 @@ class ChatScreenAdapter() :
                     when(chatMessage.message.type){
                         Message.TEXT -> {
                             ivMessage.visibility = View.GONE
+                            layoutFile.root.visibility = View.GONE
                             tvMessageContent.visibility = View.VISIBLE
                             tvMessageContent.text = item.message.decodeBase64()
                         }
@@ -136,6 +126,7 @@ class ChatScreenAdapter() :
                         Message.IMAGE -> {
                             ivMessage.visibility = View.VISIBLE
                             tvMessageContent.visibility = View.GONE
+                            layoutFile.root.visibility = View.GONE
 
                             val urlImage = item.message.decodeBase64()
                             if(urlImage.isNotEmpty()){
@@ -148,6 +139,18 @@ class ChatScreenAdapter() :
                                     .load(R.drawable.img_photo_placeholder)
                                     .into(ivMessage)
                             }
+                        }
+
+                        Message.FILE -> {
+                            layoutFile.root.visibility = View.VISIBLE
+                            tvMessageContent.visibility = View.GONE
+                            ivMessage.visibility = View.GONE
+
+                            layoutFile.tvFileName.text = item.message.decodeBase64()
+                            layoutFile.ivDownload.setOnClickListener {
+                                onDownloadClickListener(item.message.decodeBase64())
+                            }
+
                         }
                     }
                 }
@@ -178,8 +181,6 @@ class ChatScreenAdapter() :
 
             }
         }
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

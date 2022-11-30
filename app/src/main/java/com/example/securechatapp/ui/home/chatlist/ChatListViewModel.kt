@@ -12,7 +12,9 @@ import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.data.repository.ChatListRepository
 import com.example.securechatapp.data.repository.UserRepository
+import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.Constant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -95,7 +97,6 @@ class ChatListViewModel(
 
     fun addNewRoomToList(roomID: String){
         try {
-
             viewModelScope.launch {
                 API.apiService.getRoomByID(Constant.mUID, roomID).enqueue(object : Callback<ResponseObject<ChatRoom>>{
                     override fun onResponse(

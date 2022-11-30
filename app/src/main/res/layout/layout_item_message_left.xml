@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:id="@+id/clItem">
 
-<!--    message-->
     <RelativeLayout
         android:id="@+id/rlMessageContent"
         android:layout_width="wrap_content"

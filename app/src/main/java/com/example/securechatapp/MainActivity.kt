@@ -12,6 +12,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.securechatapp.data.model.ChatMessage
+import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.ui.auth.login.LoginFragment
@@ -29,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     private var binding: ActivityMainBinding? = null
     private var auth: FirebaseAuth? = null
     private var onPermissionGranted: () -> Unit = {}
+    var chatScreenHandleMessage: (ChatMessage) -> Unit = {}
+    var chatListHandleMessage: (Message) -> Unit = {}
     var onActivityResultListener : (data: Intent?) -> Unit = {}
     var imageUri: Uri? = null
 
@@ -41,8 +45,9 @@ class MainActivity : AppCompatActivity() {
 
         AppSocket.getInstance().mSocket.connect()
 
-        initListener()
         initView()
+        initListener()
+
     }
 
     private fun initListener() {
@@ -56,6 +61,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+
+        AppSocket.getInstance().onListenMessage = {
+            chatScreenHandleMessage(it)
+            chatListHandleMessage(it.message)
+        }
     }
 
     private fun initView() {

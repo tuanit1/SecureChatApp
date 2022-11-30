@@ -14,5 +14,7 @@
     <color name="ghostWhite">#FCFCFA</color>
     <color name="magnolia">#F4F4FC</color>
     <color name="gray">#797D84</color>
-    <color name="persianOrange">#E0995E</color>
+    <color name="flaveScent">#FFE797</color>
+    <color name="darkSilver">#7D6F64</color>
+    <color name="chineseBlack">#161718</color>
 </resources>

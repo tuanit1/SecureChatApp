@@ -1,11 +1,7 @@
 package com.example.securechatapp.ui.home.chatscreen
 
 import android.Manifest
-import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,14 +17,12 @@ import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.databinding.FragmentChatScreenBinding
-import com.example.securechatapp.extension.*
+import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
-import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.InjectorUtils
-import com.google.firebase.storage.FirebaseStorage
+import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
-import java.io.ByteArrayOutputStream
 
 
 class ChatScreenFragment : Fragment() {
@@ -69,19 +63,65 @@ class ChatScreenFragment : Fragment() {
         initListener()
     }
 
+    private fun initView() {
+        mRoomID = arguments?.getString(ROOM_ID)
+        val frg =
+            parentFragmentManager.findFragmentByTag(HomeFragment::class.java.name) as HomeFragment
+        chatListFragment = frg.mAdapter?.mFragments?.get(0) as ChatListFragment
+
+        val factory = InjectorUtils.provideChatScreenViewModelFactory()
+        mViewModel = ViewModelProvider(this, factory)[ChatScreenViewModel::class.java]
+
+        mAdapter = ChatScreenAdapter()
+
+        binding?.run {
+            rv.adapter = mAdapter
+            rv.layoutManager = LinearLayoutManager(context).apply { stackFromEnd = true }
+            rv.itemAnimator = DefaultItemAnimator()
+        }
+
+        loadChatRoom()
+        loadMessages()
+    }
+
     private fun initListener() {
 
         (activity as MainActivity).run {
+
+            chatScreenHandleMessage = {
+                if (it.message.roomID == mRoomID) {
+                    activity?.runOnUiThread {
+                        mViewModel?.addIncomingMessage(it)
+                    }
+                }
+            }
+
             onActivityResultListener = {
                 when (resultCode) {
                     PICK_IMAGE_REQUEST -> {
-                        onPickPhotoResult(it)
+                        mViewModel?.onPickPhotoResult(
+                            data = it,
+                            context = context,
+                            onStart = { binding?.progressBarMsg?.visibility = View.VISIBLE },
+                            onEnd = { binding?.progressBarMsg?.visibility = View.GONE }
+                        )
+
                     }
                     PICK_FILE_REQUEST -> {
-                        onPickFileResult(it)
+                        mViewModel?.onPickFileResult(
+                            data = it,
+                            context = context,
+                            onStart = { binding?.progressBarMsg?.visibility = View.VISIBLE },
+                            onEnd = { binding?.progressBarMsg?.visibility = View.GONE }
+                        )
                     }
                     TAKE_PHOTO_REQUEST -> {
-                        onTakePhotoResult()
+                        mViewModel?.onTakePhotoResult(
+                            uri = imageUri,
+                            context = context,
+                            onStart = { binding?.progressBarMsg?.visibility = View.VISIBLE },
+                            onEnd = { binding?.progressBarMsg?.visibility = View.GONE }
+                        )
                     }
                 }
             }
@@ -153,21 +193,36 @@ class ChatScreenFragment : Fragment() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
 
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE && !recyclerView.canScrollVertically(
-                            -1
-                        )
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE && !recyclerView.canScrollVertically(-1)
                     ) {
-                        mRoomID?.let { mViewModel?.loadMessage(it) }
+                        mRoomID?.let {
+                            mViewModel?.loadMessage(
+                                it,
+                                callback = object : APICallback {
+                                    override fun onStart() {
+                                        progressBarFetch.visibility = View.VISIBLE
+                                    }
+
+                                    override fun onSuccess(data: Any?) {
+                                        progressBarFetch.visibility = View.GONE
+                                    }
+
+                                    override fun onError(t: Throwable?) {
+                                        progressBarFetch.visibility = View.GONE
+                                    }
+
+                                }
+                            )
+                        }
                     }
                 }
             })
-
         }
 
-        AppSocket.getInstance().onListenMessage = {
-            if (it.message.roomID == mRoomID) {
-                activity?.runOnUiThread {
-                    mViewModel?.addIncomingMessage(it)
+        mAdapter?.onDownloadClickListener = { name ->
+            (activity as MainActivity).run {
+                checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                    mViewModel?.handleDownloadClick(name)
                 }
             }
         }
@@ -198,7 +253,10 @@ class ChatScreenFragment : Fragment() {
                 when (chatRoom.room?.type) {
                     Room.GROUP -> run {
                         tvRoomName.text = chatRoom?.room?.name?.decodeBase64()
-                        tvType.text = "@${Room.GROUP}"
+                        tvType.text = buildString {
+                            append("@")
+                            append(Room.GROUP)
+                        }
 
                         chatRoom?.room?.image?.decodeBase64()?.let { url ->
                             if (url.isNotEmpty()) {
@@ -216,7 +274,10 @@ class ChatScreenFragment : Fragment() {
                     }
                     Room.PRIVATE -> run {
                         tvRoomName.text = chatRoom?.participant?.user?.name?.decodeBase64()
-                        tvType.text = "@${Room.PRIVATE}"
+                        tvType.text = buildString {
+                            append("@")
+                            append(Room.PRIVATE)
+                        }
 
                         chatRoom?.participant?.user?.image?.decodeBase64()?.let { url ->
                             if (url.isNotEmpty()) {
@@ -234,27 +295,6 @@ class ChatScreenFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun initView() {
-        mRoomID = arguments?.getString(ROOM_ID)
-        val frg =
-            parentFragmentManager.findFragmentByTag(HomeFragment::class.java.name) as HomeFragment
-        chatListFragment = frg.mAdapter?.mFragments?.get(0) as ChatListFragment
-
-        val factory = InjectorUtils.provideChatScreenViewModelFactory()
-        mViewModel = ViewModelProvider(this, factory)[ChatScreenViewModel::class.java]
-
-        mAdapter = ChatScreenAdapter()
-
-        binding?.run {
-            rv.adapter = mAdapter
-            rv.layoutManager = LinearLayoutManager(context).apply { stackFromEnd = true }
-            rv.itemAnimator = DefaultItemAnimator()
-        }
-
-        loadChatRoom()
-        loadMessages()
     }
 
     private fun loadMessages() {
@@ -298,102 +338,6 @@ class ChatScreenFragment : Fragment() {
         }
     }
 
-    private fun onTakePhotoResult() {
-        val bitmap = MediaStore.Images.Media.getBitmap(
-            context?.contentResolver, (activity as MainActivity).imageUri
-        );
-        val os = ByteArrayOutputStream()
-        compressBitmap(bitmap).compress(Bitmap.CompressFormat.JPEG, 100, os)
-        val byteArray = os.toByteArray()
-
-        val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
-        val imageRef = FirebaseStorage.getInstance().reference.child(path)
-
-        binding?.progressBarMsg?.visibility = View.VISIBLE
-
-        imageRef.putBytes(byteArray).addOnFailureListener {
-            Log.e("tuan", it.message.toString())
-            binding?.progressBarMsg?.visibility = View.GONE
-        }.addOnSuccessListener {
-            imageRef.downloadUrl.addOnCompleteListener {
-                val downloadUrl = it.result.toString()
-                mRoomID?.let { roomId ->
-                    binding?.progressBarMsg?.visibility = View.VISIBLE
-                    mViewModel?.sendFileMessage(downloadUrl, roomId, true) {
-                        binding?.progressBarMsg?.visibility = View.GONE
-                    }
-                }
-            }.addOnFailureListener {
-                binding?.progressBarMsg?.visibility = View.GONE
-            }
-        }
-
-    }
-
-    private fun onPickPhotoResult(data: Intent?) {
-        data?.data?.let { uri ->
-            if (checkFileIsImage(context, uri)) {
-                val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
-                val imageRef = FirebaseStorage.getInstance().reference.child(path)
-                val os = ByteArrayOutputStream()
-
-                context?.let { ct ->
-                    compressBitmapFromUri(ct, uri).compress(Bitmap.CompressFormat.JPEG, 100, os)
-                    val byteArray = os.toByteArray()
-
-                    binding?.progressBarMsg?.visibility = View.VISIBLE
-                    imageRef.putBytes(byteArray).addOnFailureListener {
-                        Log.e("tuan", it.message.toString())
-                        binding?.progressBarMsg?.visibility = View.GONE
-                    }.addOnSuccessListener {
-                        imageRef.downloadUrl.addOnCompleteListener {
-                            val downloadUrl = it.result.toString()
-                            mRoomID?.let { roomId ->
-                                binding?.progressBarMsg?.visibility = View.VISIBLE
-                                mViewModel?.sendFileMessage(downloadUrl, roomId, true) {
-                                    binding?.progressBarMsg?.visibility = View.GONE
-                                }
-                            }
-                        }.addOnFailureListener {
-                            binding?.progressBarMsg?.visibility = View.GONE
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun onPickFileResult(data: Intent?) {
-        data?.data?.let { uri ->
-            if (!checkFileIsImage(context, uri)) {
-                val filename = getFileName(context, uri)
-                filename?.let { fileName ->
-                    val path = "file/$fileName"
-                    val imageRef = FirebaseStorage.getInstance().reference.child(path)
-
-                    binding?.progressBarMsg?.visibility = View.VISIBLE
-                    imageRef.putFile(uri).addOnFailureListener {
-                        Log.e("tuan", it.message.toString())
-                        binding?.progressBarMsg?.visibility = View.GONE
-                    }.addOnSuccessListener {
-                        imageRef.downloadUrl.addOnCompleteListener {
-                            val downloadUrl = it.result.toString()
-                            mRoomID?.let { roomId ->
-                                binding?.progressBarMsg?.visibility = View.VISIBLE
-                                mViewModel?.sendFileMessage(downloadUrl, roomId, false) {
-                                    binding?.progressBarMsg?.visibility = View.GONE
-                                }
-                            }
-                        }.addOnFailureListener {
-                            binding?.progressBarMsg?.visibility = View.GONE
-                        }
-                    }
-                }
-            }else{
-                onPickPhotoResult(data)
-            }
-        }
-    }
 
     private fun handleSendClick() {
 

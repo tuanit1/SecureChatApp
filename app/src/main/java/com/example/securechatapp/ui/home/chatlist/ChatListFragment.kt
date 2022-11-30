@@ -8,8 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.securechatapp.MainActivity
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Message
@@ -19,9 +21,11 @@ import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.addgroup.AddGroupFragment
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
+import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.launch
 
 
 class ChatListFragment : Fragment() {
@@ -140,7 +144,6 @@ class ChatListFragment : Fragment() {
         }
 
         mAdapter?.onItemClickListener = { roomId ->
-
             roomId?.let {
                 parentFragment?.addFragment(
                     R.id.fragmentContainerView,
@@ -149,8 +152,14 @@ class ChatListFragment : Fragment() {
                     ChatScreenFragment::class.java.name
                 )
             }
-
         }
+
+        (activity as MainActivity).run {
+            chatListHandleMessage = {
+                mViewModel?.updateLatestMessage(it)
+            }
+        }
+
 
         handleRefreshing()
         handleSearchRoom()
@@ -177,10 +186,6 @@ class ChatListFragment : Fragment() {
 
             }
         }
-    }
-
-    fun addMessage(message: Message){
-        mViewModel?.updateLatestMessage(message)
     }
 
 }

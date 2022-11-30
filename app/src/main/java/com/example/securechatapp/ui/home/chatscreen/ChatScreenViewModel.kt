@@ -1,8 +1,15 @@
 package com.example.securechatapp.ui.home.chatscreen
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.ChatRoom
@@ -10,11 +17,18 @@ import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.repository.MessageRepository
 import com.example.securechatapp.data.repository.RoomRepository
-import com.example.securechatapp.extension.encodeBase64
+import com.example.securechatapp.extension.*
 import com.example.securechatapp.utils.Constant
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.*
+import java.net.URL
+import java.net.URLConnection
 
 class ChatScreenViewModel(
     private val roomRepository: RoomRepository,
@@ -28,78 +42,91 @@ class ChatScreenViewModel(
     private var mStep = 10
 
     fun loadRoom(roomID: String, callback: APICallback) {
-        callback.onStart()
-        roomRepository.getRoomByID(Constant.mUID, roomID)
-            .enqueue(object : retrofit2.Callback<ResponseObject<ChatRoom>> {
-                override fun onResponse(
-                    call: Call<ResponseObject<ChatRoom>>,
-                    response: Response<ResponseObject<ChatRoom>>
-                ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.Main){
+                callback.onStart()
+            }
+            roomRepository.getRoomByID(Constant.mUID, roomID)
+                .enqueue(object : Callback<ResponseObject<ChatRoom>> {
+                    override fun onResponse(
+                        call: Call<ResponseObject<ChatRoom>>,
+                        response: Response<ResponseObject<ChatRoom>>
+                    ) {
 
-                    if (response.isSuccessful) {
-                        if (response.body()?.success == true) {
-                            response.body()?.data?.let {
-                                mChatRoom.postValue(it)
-                                callback.onSuccess()
+                        if (response.isSuccessful) {
+                            if (response.body()?.success == true) {
+                                response.body()?.data?.let {
+                                    mChatRoom.postValue(it)
+                                    viewModelScope.launch(Dispatchers.Main){
+                                        callback.onSuccess()
+                                    }
+                                }
                             }
                         }
                     }
-                }
 
-                override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
-                    Log.d("tuan", "load room of chat screen fail")
-                    callback.onError(t)
-                }
+                    override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
+                        Log.d("tuan", "load room of chat screen fail")
+                        viewModelScope.launch(Dispatchers.Main){
+                            callback.onError(t)
+                        }
+                    }
 
-            })
+                })
+        }
+
     }
 
     fun loadMessage(roomID: String, callback: APICallback? = null) {
-        messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
-            .enqueue(object : Callback<ResponseObject<List<ChatMessage>>> {
-                override fun onResponse(
-                    call: Call<ResponseObject<List<ChatMessage>>>,
-                    response: Response<ResponseObject<List<ChatMessage>>>
-                ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
+        viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.Main){
+                callback?.onStart()
+            }
+            messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
+                .enqueue(object : Callback<ResponseObject<List<ChatMessage>>> {
+                    override fun onResponse(
+                        call: Call<ResponseObject<List<ChatMessage>>>,
+                        response: Response<ResponseObject<List<ChatMessage>>>
+                    ) {
+                        if (response.isSuccessful && response.body()?.success == true) {
 
-                        response.body()?.data?.let { list ->
-                            if (list.isNotEmpty()) {
-                                if (mMessages.value != null) {
-                                    isAddToTop = true
-                                    mMessages.value = mMessages.value?.toMutableList()?.apply {
-                                        addAll(0, list)
+                            response.body()?.data?.let { list ->
+                                if (list.isNotEmpty()) {
+                                    if (mMessages.value != null) {
+                                        isAddToTop = true
+                                        mMessages.value = mMessages.value?.toMutableList()?.apply {
+                                            addAll(0, list)
+                                        }
+                                    } else {
+                                        isAddToTop = false
+
+                                        mMessages.value = list
                                     }
 
-                                } else {
-                                    isAddToTop = false
-
-                                    mMessages.value = list
+                                    mPage++
+                                    Log.e("tuan", "${list.size} more messages added")
                                 }
+                            }
 
+                            viewModelScope.launch(Dispatchers.Main){
                                 callback?.onSuccess()
-                                mPage++
-
-                                Log.e("tuan", "${list.size} more messages added")
-
-                                return
+                            }
+                        } else {
+                            viewModelScope.launch(Dispatchers.Main){
+                                callback?.onError()
                             }
                         }
-
-                        callback?.onSuccess()
-                    } else {
-                        callback?.onError()
                     }
-                }
 
-                override fun onFailure(
-                    call: Call<ResponseObject<List<ChatMessage>>>,
-                    t: Throwable
-                ) {
-                    callback?.onError(t)
-                }
+                    override fun onFailure(
+                        call: Call<ResponseObject<List<ChatMessage>>>,
+                        t: Throwable
+                    ) {
+                        callback?.onError(t)
+                    }
 
-            })
+                })
+        }
     }
 
     fun addIncomingMessage(chatMessage: ChatMessage) {
@@ -116,58 +143,269 @@ class ChatScreenViewModel(
             set("type", Message.TEXT)
         }
 
-        messageRepository.createMessage(Constant.mUID, roomID, body)
-            .enqueue(object : Callback<ResponseObject<Message>> {
-                override fun onResponse(
-                    call: Call<ResponseObject<Message>>,
-                    response: Response<ResponseObject<Message>>
-                ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        response.body()?.data?.let { message ->
-                            Log.e("tuan", "send message successful ${message.toString()}")
+        viewModelScope.launch(Dispatchers.IO) {
+            messageRepository.createMessage(Constant.mUID, roomID, body)
+                .enqueue(object : Callback<ResponseObject<Message>> {
+                    override fun onResponse(
+                        call: Call<ResponseObject<Message>>,
+                        response: Response<ResponseObject<Message>>
+                    ) {
+                        if (response.isSuccessful && response.body()?.success == true) {
+                            response.body()?.data?.let { message ->
+                                Log.e("tuan", "send message successful $message")
+                            }
                         }
+
+                        onFinish()
                     }
 
-                    onFinish()
-                }
+                    override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
+                        Log.e("tuan", t.toString())
+                        onFinish()
+                    }
 
-                override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
-                    Log.e("tuan", t.toString())
-                    onFinish()
-                }
-
-            })
+                })
+        }
 
     }
 
-    fun sendFileMessage(url: String, roomID: String, isImage: Boolean, onFinish: () -> Unit) {
+    private fun sendFileMessage(
+        url: String,
+        roomID: String,
+        isImage: Boolean,
+        onFinish: () -> Unit
+    ) {
         val body = HashMap<String, String>().apply {
             set("message", url.encodeBase64())
             set("type", if (isImage) Message.IMAGE else Message.FILE)
         }
 
-
-        messageRepository.createMessage(Constant.mUID, roomID, body)
-            .enqueue(object : Callback<ResponseObject<Message>> {
-                override fun onResponse(
-                    call: Call<ResponseObject<Message>>,
-                    response: Response<ResponseObject<Message>>
-                ) {
-                    if (response.isSuccessful && response.body()?.success == true) {
-                        response.body()?.data?.let { message ->
-                            Log.e("tuan", "send message successful ${message.toString()}")
+        viewModelScope.launch(Dispatchers.IO) {
+            messageRepository.createMessage(Constant.mUID, roomID, body)
+                .enqueue(object : Callback<ResponseObject<Message>> {
+                    override fun onResponse(
+                        call: Call<ResponseObject<Message>>,
+                        response: Response<ResponseObject<Message>>
+                    ) {
+                        if (response.isSuccessful && response.body()?.success == true) {
+                            response.body()?.data?.let { message ->
+                                Log.e("tuan", "send message successful $message")
+                            }
                         }
+
+                        onFinish()
                     }
 
-                    onFinish()
+                    override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
+                        Log.e("tuan", t.toString())
+                        onFinish()
+                    }
+
+                })
+        }
+    }
+
+    fun onTakePhotoResult(
+        context: Context?,
+        uri: Uri?,
+        onStart: () -> Unit,
+        onEnd: () -> Unit
+    ) {
+        val bitmap = MediaStore.Images.Media.getBitmap(
+            context?.contentResolver, uri
+        )
+        val os = ByteArrayOutputStream()
+        compressBitmap(bitmap).compress(Bitmap.CompressFormat.JPEG, 100, os)
+        val byteArray = os.toByteArray()
+
+        val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
+        val imageRef = FirebaseStorage.getInstance().reference.child(path)
+
+        onStart()
+
+        imageRef.putBytes(byteArray).addOnFailureListener {
+            onEnd()
+        }.addOnSuccessListener {
+            imageRef.downloadUrl.addOnCompleteListener {
+                val downloadUrl = it.result.toString()
+                mChatRoom.value?.room?.id?.let { roomId ->
+                    sendFileMessage(downloadUrl, roomId, true) {
+                        onEnd()
+                    }
+                }
+            }.addOnFailureListener {
+                onEnd()
+            }
+        }
+
+    }
+
+    fun onPickPhotoResult(
+        data: Intent?,
+        context: Context?,
+        onStart: () -> Unit,
+        onEnd: () -> Unit
+    ) {
+        data?.data?.let { uri ->
+            if (checkFileIsImage(context, uri)) {
+                val path = "image/message/IMG_${System.currentTimeMillis()}.jpg"
+                val imageRef = FirebaseStorage.getInstance().reference.child(path)
+                val os = ByteArrayOutputStream()
+
+                context?.let { ct ->
+                    compressBitmapFromUri(ct, uri).compress(Bitmap.CompressFormat.JPEG, 100, os)
+                    val byteArray = os.toByteArray()
+
+                    onStart()
+                    imageRef.putBytes(byteArray).addOnFailureListener {
+                        onEnd()
+                    }.addOnSuccessListener {
+                        imageRef.downloadUrl.addOnCompleteListener {
+                            val downloadUrl = it.result.toString()
+                            mChatRoom.value?.room?.id?.let { roomId ->
+                                sendFileMessage(downloadUrl, roomId, true) {
+                                    onEnd()
+                                }
+                            }
+                        }.addOnFailureListener {
+                            onEnd()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onPickFileResult(
+        data: Intent?,
+        context: Context?,
+        onStart: () -> Unit,
+        onEnd: () -> Unit
+    ) {
+        data?.data?.let { uri ->
+            if (!checkFileIsImage(context, uri)) {
+                val filename = getFileName(context, uri)
+                filename?.let { fileName ->
+
+                    val fName = fileName.split(".").first()
+                    val extension = fileName.split(".").last()
+                    val newName = "${fName}_${System.currentTimeMillis()}.$extension"
+
+                    val path = "file/$newName"
+                    val imageRef = FirebaseStorage.getInstance().reference.child(path)
+
+                    onStart()
+                    imageRef.putFile(uri).addOnFailureListener {
+                        onEnd()
+                    }.addOnSuccessListener {
+                        mChatRoom.value?.room?.id?.let { roomId ->
+                            sendFileMessage(newName, roomId, false) {
+                                onEnd()
+                            }
+                        }
+                    }
+                }
+            } else {
+                onPickPhotoResult(data, context, onStart, onEnd)
+            }
+        }
+    }
+
+    private fun getFirebaseFileUrl(name: String, onEnd: (String?) -> Unit){
+        val ref = FirebaseStorage.getInstance().reference.child("file/$name")
+        viewModelScope.launch(Dispatchers.IO) {
+            ref.downloadUrl.addOnCompleteListener {
+                try {
+                    onEnd(it.result.toString())
+                }catch (e: Exception){
+                    onEnd(null)
+                }
+            }.addOnFailureListener{
+                onEnd(null)
+            }
+        }
+    }
+
+    fun handleDownloadClick(name: String){
+
+        val downloadPath =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .toString() + "/" + "SecureChatApp"
+
+        val root = File(downloadPath)
+        if (!root.exists()) {
+            root.mkdirs()
+        }
+
+        getFirebaseFileUrl(name){ fileUrl ->
+            fileUrl?.let {
+                downloadFile(
+                    fileName = name,
+                    downloadPath = downloadPath,
+                    downloadUrl = fileUrl,
+                    onStart = {},
+                    onEnd = {}
+                )
+            }
+        }
+    }
+
+    private fun downloadFile(
+        fileName: String,
+        downloadPath: String,
+        downloadUrl: String,
+        onStart: () -> Unit,
+        onEnd: () -> Unit
+    ){
+
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.Main) {
+                onStart()
+            }
+            var count: Int
+            try {
+                val url = URL(downloadUrl)
+                val connection: URLConnection = url.openConnection()
+                connection.connect()
+
+                // this will be useful so that you can show a tipical 0-100%
+                // progress bar
+                val lengthOfFile: Int = connection.contentLength
+
+                // download the file
+                val input: InputStream = BufferedInputStream(
+                    url.openStream(),
+                    8192
+                )
+
+                // Output stream
+                val output: OutputStream = FileOutputStream(
+                    "$downloadPath/$fileName"
+                )
+                val data = ByteArray(1024)
+                var total: Long = 0
+                while ((input.read(data).also { count = it }) != -1) {
+                    total += count.toLong()
+                    val progress = (total*100)/lengthOfFile
+                    Log.e("tuan", progress.toString())
+                    output.write(data, 0, count)
                 }
 
-                override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
-                    Log.e("tuan", t.toString())
-                    onFinish()
+                output.flush()
+                output.close()
+                input.close()
+
+                withContext(Dispatchers.Main) {
+                    onEnd()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    onEnd()
                 }
 
-            })
+                Log.e("tuan", e.message.toString())
+            }
+        }
     }
 
 }
