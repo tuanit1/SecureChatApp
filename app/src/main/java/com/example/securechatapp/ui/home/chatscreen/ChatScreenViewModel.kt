@@ -92,6 +92,9 @@ class ChatScreenViewModel(
 
                             response.body()?.data?.let { list ->
                                 if (list.isNotEmpty()) {
+
+                                    checkFileMessageDownload(list)
+
                                     if (mMessages.value != null) {
                                         isAddToTop = true
                                         mMessages.value = mMessages.value?.toMutableList()?.apply {
@@ -326,13 +329,15 @@ class ChatScreenViewModel(
         }
     }
 
-    fun handleDownloadClick(name: String){
+    fun handleDownloadClick(
+        name: String,
+        onStart: () -> Unit,
+        onEnd: () -> Unit
+    ){
 
-        val downloadPath =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .toString() + "/" + "SecureChatApp"
 
-        val root = File(downloadPath)
+
+        val root = File(Constant.DOWNLOAD_PATH)
         if (!root.exists()) {
             root.mkdirs()
         }
@@ -341,10 +346,10 @@ class ChatScreenViewModel(
             fileUrl?.let {
                 downloadFile(
                     fileName = name,
-                    downloadPath = downloadPath,
+                    downloadPath = Constant.DOWNLOAD_PATH,
                     downloadUrl = fileUrl,
-                    onStart = {},
-                    onEnd = {}
+                    onStart,
+                    onEnd
                 )
             }
         }
@@ -368,17 +373,12 @@ class ChatScreenViewModel(
                 val connection: URLConnection = url.openConnection()
                 connection.connect()
 
-                // this will be useful so that you can show a tipical 0-100%
-                // progress bar
                 val lengthOfFile: Int = connection.contentLength
 
-                // download the file
                 val input: InputStream = BufferedInputStream(
                     url.openStream(),
                     8192
                 )
-
-                // Output stream
                 val output: OutputStream = FileOutputStream(
                     "$downloadPath/$fileName"
                 )
@@ -406,6 +406,19 @@ class ChatScreenViewModel(
                 Log.e("tuan", e.message.toString())
             }
         }
+    }
+
+    private fun checkFileMessageDownload(list: List<ChatMessage>): List<ChatMessage> {
+
+        list.forEachIndexed { index, item ->
+            if(item.message.type == Message.FILE){
+                File("${Constant.DOWNLOAD_PATH}/${item.message.message.decodeBase64()}").run {
+                    list[index].message.isDownloaded = exists()
+                }
+            }
+        }
+
+        return list
     }
 
 }

@@ -13,6 +13,7 @@ data class Message(
     var uid: String,
     @SerializedName("room_id")
     var roomID: String,
+    var isDownloaded: Boolean = false
 ){
     companion object{
         const val TEXT = "text"

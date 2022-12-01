@@ -3,6 +3,8 @@ package com.example.securechatapp.ui.home.chatscreen
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +14,7 @@ import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.databinding.LayoutItemMessageLeftBinding
 import com.example.securechatapp.databinding.LayoutItemMessageRightBinding
+import com.example.securechatapp.databinding.LayoutMessageFileBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.extension.getDiffInMinute
 import com.example.securechatapp.extension.toFormattedDate
@@ -25,7 +28,11 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
         const val RIGHT_MESSAGE = 2
     }
 
-    var onDownloadClickListener: (String) -> Unit = {}
+    var onDownloadClickListener: (
+        String,
+        ProgressBar,
+        ImageView
+    ) -> Unit = {_,_,_ ->}
 
     inner class ViewHolder(
         private val mBinding: ViewBinding
@@ -55,12 +62,14 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
                             Message.TEXT -> {
                                 ivMessage.visibility = View.GONE
                                 tvMessageContent.visibility = View.VISIBLE
+                                layoutFile.root.visibility = View.GONE
                                 tvMessageContent.text = item.message.decodeBase64()
                             }
 
                             Message.IMAGE -> {
                                 ivMessage.visibility = View.VISIBLE
                                 tvMessageContent.visibility = View.GONE
+                                layoutFile.root.visibility = View.GONE
 
                                 val urlImage = item.message.decodeBase64()
                                 if(urlImage.isNotEmpty()){
@@ -80,10 +89,7 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
                                 tvMessageContent.visibility = View.GONE
                                 ivMessage.visibility = View.GONE
 
-                                layoutFile.tvFileName.text = item.message.decodeBase64()
-                                layoutFile.ivDownload.setOnClickListener {
-                                    onDownloadClickListener(item.message.decodeBase64())
-                                }
+                                handleFileMessage(layoutFile, item)
                             }
                         }
                     }
@@ -142,21 +148,37 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
                         }
 
                         Message.FILE -> {
-                            layoutFile.root.visibility = View.VISIBLE
+
                             tvMessageContent.visibility = View.GONE
                             ivMessage.visibility = View.GONE
-
-                            layoutFile.tvFileName.text = item.message.decodeBase64()
-                            layoutFile.ivDownload.setOnClickListener {
-                                onDownloadClickListener(item.message.decodeBase64())
-                            }
-
+                            layoutFile.root.visibility = View.VISIBLE
+                            handleFileMessage(layoutFile, item)
                         }
                     }
                 }
 
             }
         }
+
+        private fun handleFileMessage(
+            layoutFile: LayoutMessageFileBinding,
+            item: Message
+        ){
+            layoutFile.run {
+                tvFileName.text = item.message.decodeBase64()
+                ivDownload.isSelected = item.isDownloaded
+                ivDownload.setOnClickListener {
+                    if(!item.isDownloaded){
+                        onDownloadClickListener(
+                            item.message.decodeBase64(),
+                            progressBar,
+                            ivDownload
+                        )
+                    }
+                }
+            }
+        }
+
 
         private fun setItemLayoutParams(layoutParam: RecyclerView.LayoutParams) {
             val dim2dp = itemView.context.resources.getDimension(R.dimen._2dp).toInt()

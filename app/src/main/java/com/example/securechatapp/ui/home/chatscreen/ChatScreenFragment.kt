@@ -2,6 +2,7 @@ package com.example.securechatapp.ui.home.chatscreen
 
 import android.Manifest
 import android.os.Bundle
+import android.os.FileObserver
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import com.example.securechatapp.databinding.FragmentChatScreenBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
+import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -193,7 +195,9 @@ class ChatScreenFragment : Fragment() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
 
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE && !recyclerView.canScrollVertically(-1)
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE && !recyclerView.canScrollVertically(
+                            -1
+                        )
                     ) {
                         mRoomID?.let {
                             mViewModel?.loadMessage(
@@ -219,10 +223,16 @@ class ChatScreenFragment : Fragment() {
             })
         }
 
-        mAdapter?.onDownloadClickListener = { name ->
+        mAdapter?.onDownloadClickListener = { name, progressBar, ivDownload ->
             (activity as MainActivity).run {
                 checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                    mViewModel?.handleDownloadClick(name)
+                    mViewModel?.handleDownloadClick(name,
+                        onStart = {
+                            Snackbar.make(requireView(), "start download", Snackbar.LENGTH_SHORT).show()
+                        },
+                        onEnd = {
+                            Snackbar.make(requireView(), "end download 🆗", Snackbar.LENGTH_SHORT).show()
+                        })
                 }
             }
         }
@@ -230,6 +240,7 @@ class ChatScreenFragment : Fragment() {
         observeRoom()
         observeMessages()
     }
+
 
     private fun observeMessages() {
         binding?.run {
@@ -337,26 +348,4 @@ class ChatScreenFragment : Fragment() {
             })
         }
     }
-
-
-    private fun handleSendClick() {
-
-//        binding?.run {
-//            if(edtMessage.text.isNotEmpty()){
-//                val text = edtMessage.text.toString()
-//
-//                mRoomID?.let { mRoomID ->
-//                    val message = Message("aaa", text.encodeBase64(), "2022-11-05T02:12:07.937Z", "text", Constant.mUID,
-//                        mRoomID
-//                    )
-//                    chatListFragment?.addMessage(message)
-//                    parentFragmentManager.popBackStack()
-//                }
-//            }
-//        }
-
-
-    }
-
-
 }
