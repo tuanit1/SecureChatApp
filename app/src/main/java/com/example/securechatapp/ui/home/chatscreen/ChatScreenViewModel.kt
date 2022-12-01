@@ -332,11 +332,9 @@ class ChatScreenViewModel(
     fun handleDownloadClick(
         name: String,
         onStart: () -> Unit,
-        onEnd: () -> Unit
+        onEnd: (Boolean) -> Unit,
+        onProgress: (Int) -> Unit
     ){
-
-
-
         val root = File(Constant.DOWNLOAD_PATH)
         if (!root.exists()) {
             root.mkdirs()
@@ -349,7 +347,8 @@ class ChatScreenViewModel(
                     downloadPath = Constant.DOWNLOAD_PATH,
                     downloadUrl = fileUrl,
                     onStart,
-                    onEnd
+                    onEnd,
+                    onProgress
                 )
             }
         }
@@ -360,7 +359,8 @@ class ChatScreenViewModel(
         downloadPath: String,
         downloadUrl: String,
         onStart: () -> Unit,
-        onEnd: () -> Unit
+        onEnd: (Boolean) -> Unit,
+        onProgress: (Int) -> Unit
     ){
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -387,7 +387,7 @@ class ChatScreenViewModel(
                 while ((input.read(data).also { count = it }) != -1) {
                     total += count.toLong()
                     val progress = (total*100)/lengthOfFile
-                    Log.e("tuan", progress.toString())
+                    onProgress(progress.toInt())
                     output.write(data, 0, count)
                 }
 
@@ -396,11 +396,11 @@ class ChatScreenViewModel(
                 input.close()
 
                 withContext(Dispatchers.Main) {
-                    onEnd()
+                    onEnd(true)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    onEnd()
+                    onEnd(false)
                 }
 
                 Log.e("tuan", e.message.toString())
@@ -410,15 +410,48 @@ class ChatScreenViewModel(
 
     private fun checkFileMessageDownload(list: List<ChatMessage>): List<ChatMessage> {
 
-        list.forEachIndexed { index, item ->
-            if(item.message.type == Message.FILE){
-                File("${Constant.DOWNLOAD_PATH}/${item.message.message.decodeBase64()}").run {
-                    list[index].message.isDownloaded = exists()
+//        list.forEachIndexed { index, item ->
+//            if(item.message.type == Message.FILE){
+//                File("${Constant.DOWNLOAD_PATH}/${item.message.message.decodeBase64()}").run {
+//                    list[index] = list[index]
+//                }
+//            }
+//        }
+
+        return list.toMutableList().apply {
+            forEachIndexed{ index, chatMessage ->
+                if(chatMessage.message.type == Message.FILE){
+                    File("${Constant.DOWNLOAD_PATH}/${chatMessage.message.message.decodeBase64()}").run {
+                        this@apply[index] = get(index).copy().apply {
+                            message = message.copy().apply {
+                                this.isDownloaded = exists()
+                            }
+                        }
+                    }
                 }
             }
         }
+    }
 
-        return list
+    fun checkDownloadFolderChange(){
+        mMessages.value?.let { list ->
+            val newList = checkFileMessageDownload(list)
+            mMessages.postValue(newList.toMutableList())
+        }
+    }
+
+    fun setMessageDownloadState(messageID: String, isDownloaded: Boolean){
+        mMessages.value = mMessages.value?.toMutableList()?.apply {
+            forEachIndexed{ index, chatMessage ->
+                if (chatMessage.message.id == messageID){
+                    this[index] = get(index).copy().apply {
+                        message = message.copy().apply {
+                            this.isDownloaded = isDownloaded
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

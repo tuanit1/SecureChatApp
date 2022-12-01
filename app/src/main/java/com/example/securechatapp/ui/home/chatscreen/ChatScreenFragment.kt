@@ -3,6 +3,7 @@ package com.example.securechatapp.ui.home.chatscreen
 import android.Manifest
 import android.os.Bundle
 import android.os.FileObserver
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -223,16 +224,27 @@ class ChatScreenFragment : Fragment() {
             })
         }
 
-        mAdapter?.onDownloadClickListener = { name, progressBar, ivDownload ->
+        mAdapter?.onDownloadClickListener = { messageID, name, progressBar, ivDownload ->
             (activity as MainActivity).run {
                 checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                    mViewModel?.handleDownloadClick(name,
+                    mViewModel?.handleDownloadClick(
+                        name,
                         onStart = {
-                            Snackbar.make(requireView(), "start download", Snackbar.LENGTH_SHORT).show()
+                            ivDownload.visibility = View.GONE
+                            progressBar.visibility = View.VISIBLE
                         },
-                        onEnd = {
-                            Snackbar.make(requireView(), "end download 🆗", Snackbar.LENGTH_SHORT).show()
-                        })
+                        onEnd = { isSuccess ->
+                            if(isSuccess){
+                                mViewModel?.setMessageDownloadState(messageID, true)
+                            }else{
+                                Snackbar.make(requireView(), "Something wrong when download $name 😥", Snackbar.LENGTH_SHORT)
+                                    .show()
+                            }
+                        },
+                        onProgress = { progress ->
+                            progressBar.progress = progress
+                        }
+                    )
                 }
             }
         }
@@ -347,5 +359,10 @@ class ChatScreenFragment : Fragment() {
                 }
             })
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mViewModel?.checkDownloadFolderChange()
     }
 }

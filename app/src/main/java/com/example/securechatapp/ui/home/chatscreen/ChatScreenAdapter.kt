@@ -30,9 +30,10 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
 
     var onDownloadClickListener: (
         String,
+        String,
         ProgressBar,
         ImageView
-    ) -> Unit = {_,_,_ ->}
+    ) -> Unit = {_,_,_,_ ->}
 
     inner class ViewHolder(
         private val mBinding: ViewBinding
@@ -166,10 +167,13 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
         ){
             layoutFile.run {
                 tvFileName.text = item.message.decodeBase64()
+                progressBar.visibility = View.GONE
+                ivDownload.visibility = View.VISIBLE
                 ivDownload.isSelected = item.isDownloaded
                 ivDownload.setOnClickListener {
                     if(!item.isDownloaded){
                         onDownloadClickListener(
+                            item.id,
                             item.message.decodeBase64(),
                             progressBar,
                             ivDownload
@@ -235,7 +239,7 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
 
     class ChatMessageDiffCallback : DiffUtil.ItemCallback<ChatMessage>() {
         override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
-            return oldItem == newItem
+            return oldItem.message.id == newItem.message.id
         }
 
         override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
