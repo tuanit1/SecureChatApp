@@ -1,18 +1,23 @@
 package com.example.securechatapp.ui.auth.login
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.securechatapp.R
+import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.databinding.FragmentLoginBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.replaceFragment
 import com.example.securechatapp.ui.auth.signup.SignupFragment
 import com.example.securechatapp.ui.home.HomeFragment
+import com.example.securechatapp.ui.home.chatscreen.ChatScreenViewModel
 import com.example.securechatapp.utils.Constant
+import com.example.securechatapp.utils.InjectorUtils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -26,6 +31,7 @@ class LoginFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private var binding: FragmentLoginBinding? = null
+    private var mViewModel: LoginViewModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,8 +45,14 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initView()
         initListener()
 
+    }
+
+    private fun initView() {
+        val factory = InjectorUtils.provideLoginViewModelFactory()
+        mViewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
     }
 
     private fun initListener() {
@@ -71,12 +83,29 @@ class LoginFragment : Fragment() {
                 btnLogin.showProgress(true)
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener{
-                        btnLogin.showProgress(false)
                         if(it.isSuccessful){
                             Constant.mUID = it.result?.user?.uid ?: ""
 
-                            Toast.makeText(context, "login successfully!", Toast.LENGTH_SHORT).show()
-                            openHomeFragment()
+                            if(Constant.mUID.isNotEmpty()){
+                                mViewModel?.getAuthToken(object: APICallback{
+                                    override fun onStart() = Unit
+
+                                    override fun onSuccess(data: Any?) {
+                                        btnLogin.showProgress(false)
+                                        Toast.makeText(context, "login successfully!", Toast.LENGTH_SHORT).show()
+                                        openHomeFragment()
+                                    }
+
+                                    override fun onError(t: Throwable?) {
+                                        btnLogin.showProgress(false)
+                                        Toast.makeText(context, "Fail when request authorization!", Toast.LENGTH_SHORT).show()
+                                        Log.e("tuan", t?.message.toString())
+                                    }
+
+                                })
+                            }
+
+
                         }else{
                             it.exception?.let { e ->
                                 Toast.makeText(context, e.message.toString(), Toast.LENGTH_SHORT).show()

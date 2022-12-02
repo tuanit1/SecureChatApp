@@ -2,8 +2,6 @@ package com.example.securechatapp.ui.home.chatscreen
 
 import android.Manifest
 import android.os.Bundle
-import android.os.FileObserver
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +20,6 @@ import com.example.securechatapp.databinding.FragmentChatScreenBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
-import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso

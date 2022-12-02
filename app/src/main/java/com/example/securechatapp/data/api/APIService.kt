@@ -7,6 +7,10 @@ import retrofit2.http.*
 
 interface APIService {
 
+    //AUTH
+    @POST("auth/login/{uid}")
+    fun getAuthToken(@Path("uid") uid: String): Call<ResponseObject<AuthToken>>
+
     //ROOM
     @GET("room/{uid}")
     fun getRoomList(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
