@@ -1,4 +1,4 @@
-package com.example.securechatapp.data.model
+package com.example.securechatapp.data.model.api
 import com.google.gson.annotations.SerializedName
 
 data class ResponseObject<T>(

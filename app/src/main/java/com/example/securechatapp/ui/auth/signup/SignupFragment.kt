@@ -8,8 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.securechatapp.data.api.API
-import com.example.securechatapp.data.api.APIService
-import com.example.securechatapp.data.model.ResponseObject
+import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentSignupBinding
 import com.example.securechatapp.extension.encodeBase64
@@ -67,7 +66,7 @@ class SignupFragment : Fragment() {
             val name: String = edtName.getText()
 
             if(email.isEmpty() || password.isEmpty() || phone.isEmpty() || name.isEmpty()){
-                Toast.makeText(context, "Some field is missing, please check again!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Some field is missing, please check again!", Toast.LENGTH_SHORT).show()
             }else{
                 btnSignup.showProgress(true)
                 auth.createUserWithEmailAndPassword(email, password)

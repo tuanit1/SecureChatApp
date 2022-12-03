@@ -1,9 +1,14 @@
 package com.example.securechatapp.data.api
 
 import com.example.securechatapp.data.model.*
-import kotlinx.coroutines.Deferred
+import com.example.securechatapp.data.model.api.AuthToken
+import com.example.securechatapp.data.model.api.ResponseObject
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface APIService {
 
@@ -11,24 +16,19 @@ interface APIService {
     @POST("auth/login/{uid}")
     fun getAuthToken(@Path("uid") uid: String): Call<ResponseObject<AuthToken>>
 
+    @POST("auth/token")
+    fun refreshToken(@Body body: HashMap<String, String>): Call<ResponseObject<AuthToken>>
+
     //ROOM
     @GET("room/{uid}")
     fun getRoomList(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
 
-    @Headers(
-        "Content-Type: application/json",
-        "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
-    )
     @POST("room/{uid}")
-    suspend fun addRoom(
+    fun addRoom(
         @Path("uid") uid: String,
         @Body body: HashMap<String, String>
-    ): ResponseObject<Room>
+    ): Call<ResponseObject<Room>>
 
-    @Headers(
-        "Content-Type: application/json",
-        "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
-    )
     @POST("room/private/{currentUID}&{otherUID}")
     suspend fun createPrivateRoom(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String): ResponseObject<Room>
 
@@ -49,15 +49,11 @@ interface APIService {
     fun addUser(@Body user: User): Call<ResponseObject<User>>
 
     //PARTICIPANT
-    @Headers(
-        "Content-Type: application/json",
-        "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbklkIjoiNjJkN2I4YWYyNmE1NTliZDhmOTRkNDA3IiwiaWF0IjoxNjU4Nzk5MDIyfQ.Xi-0E_F_5aqI_zICxPre-4XgRUIazLVIk3iJUviN1gk"
-    )
     @POST("participant/{uid}&{roomId}")
     suspend fun addParticipant(
         @Path("uid") uid: String,
         @Path("roomId") roomId: String,
-    ): ResponseObject<Participant>
+    ): Response<ResponseObject<Participant>>
 
     //MESSAGE
     @GET("message/page/{roomID}&{page}&{step}")

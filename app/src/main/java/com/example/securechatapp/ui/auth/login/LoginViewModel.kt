@@ -3,8 +3,8 @@ package com.example.securechatapp.ui.auth.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.APICallback
-import com.example.securechatapp.data.model.AuthToken
-import com.example.securechatapp.data.model.ResponseObject
+import com.example.securechatapp.data.model.api.AuthToken
+import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.LocalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,9 +25,11 @@ class LoginViewModel(
                 ) {
                     if(response.isSuccessful && response.body()?.success == true){
                         response.body()?.data?.let { authToken ->
+                            localRepository.saveAccessToken(authToken.accessToken)
+                            localRepository.saveRefreshToken(authToken.refreshToken)
+                            callback.onSuccess()
+                        } ?: callback.onError()
 
-                        }
-                        callback.onSuccess()
                     }else{
                         callback.onError()
                     }

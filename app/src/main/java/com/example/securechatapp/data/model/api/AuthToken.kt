@@ -1,4 +1,4 @@
-package com.example.securechatapp.data.model
+package com.example.securechatapp.data.model.api
 
 data class AuthToken(
     val accessToken: String,

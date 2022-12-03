@@ -1,15 +1,12 @@
 package com.example.securechatapp.ui.home.setting
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.securechatapp.R
+import androidx.fragment.app.Fragment
 import com.example.securechatapp.databinding.FragmentSettingBinding
-import com.example.securechatapp.extension.replaceFragment
-import com.example.securechatapp.ui.auth.login.LoginFragment
-import com.example.securechatapp.utils.Constant
+import com.example.securechatapp.ui.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -41,22 +38,10 @@ class SettingFragment : Fragment() {
     private fun initListener() {
         binding?.run {
             btnLogout.setOnClickListener {
-                handleSignOut()
+                with(activity as MainActivity){
+                    handleLogout()
+                }
             }
         }
     }
-
-    private fun handleSignOut(){
-        auth?.signOut()
-        Constant.mUID = ""
-
-        parentFragment?.replaceFragment(
-            R.id.fragmentContainerView,
-            LoginFragment.newInstance(),
-            addToBackStack = true,
-            tag = LoginFragment::class.java.name
-        )
-    }
-
-
 }

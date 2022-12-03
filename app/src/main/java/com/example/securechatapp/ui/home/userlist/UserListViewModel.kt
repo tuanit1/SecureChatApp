@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
-import com.example.securechatapp.data.model.ResponseObject
 import com.example.securechatapp.data.model.User
+import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.RoomRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
@@ -27,7 +27,7 @@ class UserListViewModel(
         callback.onStart()
 
         userRepository.getAllUser()
-            .enqueue(object : retrofit2.Callback<ResponseObject<MutableList<User>>> {
+            .enqueue(object : Callback<ResponseObject<MutableList<User>>> {
                 override fun onResponse(
                     call: Call<ResponseObject<MutableList<User>>>,
                     response: Response<ResponseObject<MutableList<User>>>

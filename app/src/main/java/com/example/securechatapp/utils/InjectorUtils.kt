@@ -1,9 +1,7 @@
 package com.example.securechatapp.utils
 
-import com.example.securechatapp.data.repository.ChatListRepository
-import com.example.securechatapp.data.repository.MessageRepository
-import com.example.securechatapp.data.repository.RoomRepository
-import com.example.securechatapp.data.repository.UserRepository
+import android.content.Context
+import com.example.securechatapp.data.repository.*
 import com.example.securechatapp.ui.auth.login.LoginViewModelFactory
 import com.example.securechatapp.ui.home.addgroup.AddGroupViewModelFactory
 import com.example.securechatapp.ui.home.chatlist.ChatListViewModelFactory
@@ -34,8 +32,8 @@ object InjectorUtils {
         return ChatScreenViewModelFactory(roomRepository, messageRepository)
     }
 
-    fun provideLoginViewModelFactory(): LoginViewModelFactory {
-        val localRepository = LocalRepository()
+    fun provideLoginViewModelFactory(context: Context): LoginViewModelFactory {
+        val localRepository = LocalRepository(context)
         return LoginViewModelFactory(localRepository)
     }
 }

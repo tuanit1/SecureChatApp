@@ -4,17 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Message
-import com.example.securechatapp.data.model.ResponseObject
+import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.MessageRepository
 import com.example.securechatapp.data.repository.RoomRepository
 import com.example.securechatapp.extension.*
@@ -30,6 +30,7 @@ import java.io.*
 import java.net.URL
 import java.net.URLConnection
 
+@Suppress("DEPRECATION")
 class ChatScreenViewModel(
     private val roomRepository: RoomRepository,
     private val messageRepository: MessageRepository
@@ -37,13 +38,14 @@ class ChatScreenViewModel(
 
     var mChatRoom: MutableLiveData<ChatRoom> = MutableLiveData()
     var mMessages: MutableLiveData<List<ChatMessage>> = MutableLiveData()
+    var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
     var isAddToTop: Boolean = false
     private var mPage = 0
     private var mStep = 10
 
     fun loadRoom(roomID: String, callback: APICallback) {
         viewModelScope.launch(Dispatchers.IO) {
-            viewModelScope.launch(Dispatchers.Main){
+            viewModelScope.launch(Dispatchers.Main) {
                 callback.onStart()
             }
             roomRepository.getRoomByID(Constant.mUID, roomID)
@@ -52,22 +54,34 @@ class ChatScreenViewModel(
                         call: Call<ResponseObject<ChatRoom>>,
                         response: Response<ResponseObject<ChatRoom>>
                     ) {
-
-                        if (response.isSuccessful) {
-                            if (response.body()?.success == true) {
-                                response.body()?.data?.let {
-                                    mChatRoom.postValue(it)
-                                    viewModelScope.launch(Dispatchers.Main){
-                                        callback.onSuccess()
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                if (response.isSuccessful) {
+                                    if (response.body()?.success == true) {
+                                        response.body()?.data?.let {
+                                            mChatRoom.postValue(it)
+                                            viewModelScope.launch(Dispatchers.Main) {
+                                                callback.onSuccess()
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                        }
+                            },
+                            onTokenUpdated = {
+                                loadRoom(roomID, callback)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = { callback.onError() }
+                        )
+
                     }
 
                     override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
                         Log.d("tuan", "load room of chat screen fail")
-                        viewModelScope.launch(Dispatchers.Main){
+                        viewModelScope.launch(Dispatchers.Main) {
                             callback.onError(t)
                         }
                     }
@@ -79,7 +93,7 @@ class ChatScreenViewModel(
 
     fun loadMessage(roomID: String, callback: APICallback? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            viewModelScope.launch(Dispatchers.Main){
+            viewModelScope.launch(Dispatchers.Main) {
                 callback?.onStart()
             }
             messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
@@ -88,37 +102,52 @@ class ChatScreenViewModel(
                         call: Call<ResponseObject<List<ChatMessage>>>,
                         response: Response<ResponseObject<List<ChatMessage>>>
                     ) {
-                        if (response.isSuccessful && response.body()?.success == true) {
 
-                            response.body()?.data?.let { list ->
-                                if (list.isNotEmpty()) {
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                if (response.body()?.success == true) {
 
-                                    checkFileMessageDownload(list)
+                                    response.body()?.data?.let { list ->
+                                        if (list.isNotEmpty()) {
+                                            checkFileMessageDownload(list)
 
-                                    if (mMessages.value != null) {
-                                        isAddToTop = true
-                                        mMessages.value = mMessages.value?.toMutableList()?.apply {
-                                            addAll(0, list)
+                                            if (mMessages.value != null) {
+                                                isAddToTop = true
+                                                mMessages.value =
+                                                    mMessages.value?.toMutableList()?.apply {
+                                                        addAll(0, list)
+                                                    }
+                                            } else {
+                                                isAddToTop = false
+
+                                                mMessages.value = list
+                                            }
+
+                                            mPage++
+                                            Log.e("tuan", "${list.size} more messages added")
                                         }
-                                    } else {
-                                        isAddToTop = false
-
-                                        mMessages.value = list
                                     }
 
-                                    mPage++
-                                    Log.e("tuan", "${list.size} more messages added")
+                                    viewModelScope.launch(Dispatchers.Main) {
+                                        callback?.onSuccess()
+                                    }
+                                } else {
+                                    viewModelScope.launch(Dispatchers.Main) {
+                                        callback?.onError()
+                                    }
                                 }
-                            }
+                            },
+                            onTokenUpdated = {
+                                loadMessage(roomID, callback)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = { callback?.onError() }
+                        )
 
-                            viewModelScope.launch(Dispatchers.Main){
-                                callback?.onSuccess()
-                            }
-                        } else {
-                            viewModelScope.launch(Dispatchers.Main){
-                                callback?.onError()
-                            }
-                        }
+
                     }
 
                     override fun onFailure(
@@ -153,13 +182,28 @@ class ChatScreenViewModel(
                         call: Call<ResponseObject<Message>>,
                         response: Response<ResponseObject<Message>>
                     ) {
-                        if (response.isSuccessful && response.body()?.success == true) {
-                            response.body()?.data?.let { message ->
-                                Log.e("tuan", "send message successful $message")
-                            }
-                        }
 
-                        onFinish()
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                if (response.isSuccessful && response.body()?.success == true) {
+                                    response.body()?.data?.let { message ->
+                                        Log.e("tuan", "send message successful $message")
+                                    }
+                                }
+
+                                onFinish()
+                            },
+                            onTokenUpdated = {
+                                sendTextMessage(text, roomID, onFinish)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = { onFinish() }
+                        )
+
+
                     }
 
                     override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
@@ -190,13 +234,28 @@ class ChatScreenViewModel(
                         call: Call<ResponseObject<Message>>,
                         response: Response<ResponseObject<Message>>
                     ) {
-                        if (response.isSuccessful && response.body()?.success == true) {
-                            response.body()?.data?.let { message ->
-                                Log.e("tuan", "send message successful $message")
-                            }
-                        }
 
-                        onFinish()
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                if (response.isSuccessful && response.body()?.success == true) {
+                                    response.body()?.data?.let { message ->
+                                        Log.e("tuan", "send message successful $message")
+                                    }
+                                }
+
+                                onFinish()
+                            },
+                            onTokenUpdated = {
+                                sendFileMessage(url, roomID, isImage, onFinish)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = onFinish
+                        )
+
+
                     }
 
                     override fun onFailure(call: Call<ResponseObject<Message>>, t: Throwable) {
@@ -314,16 +373,16 @@ class ChatScreenViewModel(
         }
     }
 
-    private fun getFirebaseFileUrl(name: String, onEnd: (String?) -> Unit){
+    private fun getFirebaseFileUrl(name: String, onEnd: (String?) -> Unit) {
         val ref = FirebaseStorage.getInstance().reference.child("file/$name")
         viewModelScope.launch(Dispatchers.IO) {
             ref.downloadUrl.addOnCompleteListener {
                 try {
                     onEnd(it.result.toString())
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     onEnd(null)
                 }
-            }.addOnFailureListener{
+            }.addOnFailureListener {
                 onEnd(null)
             }
         }
@@ -334,13 +393,13 @@ class ChatScreenViewModel(
         onStart: () -> Unit,
         onEnd: (Boolean) -> Unit,
         onProgress: (Int) -> Unit
-    ){
+    ) {
         val root = File(Constant.DOWNLOAD_PATH)
         if (!root.exists()) {
             root.mkdirs()
         }
 
-        getFirebaseFileUrl(name){ fileUrl ->
+        getFirebaseFileUrl(name) { fileUrl ->
             fileUrl?.let {
                 downloadFile(
                     fileName = name,
@@ -361,7 +420,7 @@ class ChatScreenViewModel(
         onStart: () -> Unit,
         onEnd: (Boolean) -> Unit,
         onProgress: (Int) -> Unit
-    ){
+    ) {
 
         viewModelScope.launch(Dispatchers.IO) {
             withContext(Dispatchers.Main) {
@@ -386,7 +445,7 @@ class ChatScreenViewModel(
                 var total: Long = 0
                 while ((input.read(data).also { count = it }) != -1) {
                     total += count.toLong()
-                    val progress = (total*100)/lengthOfFile
+                    val progress = (total * 100) / lengthOfFile
                     onProgress(progress.toInt())
                     output.write(data, 0, count)
                 }
@@ -409,18 +468,9 @@ class ChatScreenViewModel(
     }
 
     private fun checkFileMessageDownload(list: List<ChatMessage>): List<ChatMessage> {
-
-//        list.forEachIndexed { index, item ->
-//            if(item.message.type == Message.FILE){
-//                File("${Constant.DOWNLOAD_PATH}/${item.message.message.decodeBase64()}").run {
-//                    list[index] = list[index]
-//                }
-//            }
-//        }
-
         return list.toMutableList().apply {
-            forEachIndexed{ index, chatMessage ->
-                if(chatMessage.message.type == Message.FILE){
+            forEachIndexed { index, chatMessage ->
+                if (chatMessage.message.type == Message.FILE) {
                     File("${Constant.DOWNLOAD_PATH}/${chatMessage.message.message.decodeBase64()}").run {
                         this@apply[index] = get(index).copy().apply {
                             message = message.copy().apply {
@@ -433,17 +483,17 @@ class ChatScreenViewModel(
         }
     }
 
-    fun checkDownloadFolderChange(){
+    fun checkDownloadFolderChange() {
         mMessages.value?.let { list ->
             val newList = checkFileMessageDownload(list)
             mMessages.postValue(newList.toMutableList())
         }
     }
 
-    fun setMessageDownloadState(messageID: String, isDownloaded: Boolean){
+    fun setMessageDownloadState(messageID: String, isDownloaded: Boolean) {
         mMessages.value = mMessages.value?.toMutableList()?.apply {
-            forEachIndexed{ index, chatMessage ->
-                if (chatMessage.message.id == messageID){
+            forEachIndexed { index, chatMessage ->
+                if (chatMessage.message.id == messageID) {
                     this[index] = get(index).copy().apply {
                         message = message.copy().apply {
                             this.isDownloaded = isDownloaded

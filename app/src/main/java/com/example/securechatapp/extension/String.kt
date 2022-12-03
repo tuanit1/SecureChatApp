@@ -1,13 +1,11 @@
 package com.example.securechatapp.extension
 
 import android.util.Base64
-import android.widget.Toast
-import java.io.UnsupportedEncodingException
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-fun String.decodeBase64(): String{
+fun String?.decodeBase64(): String{
     var text1 = ""
     try {
         val data1: ByteArray = Base64.decode(this, Base64.DEFAULT)

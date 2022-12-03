@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.securechatapp.MainActivity
+import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
@@ -246,8 +246,18 @@ class ChatScreenFragment : Fragment() {
             }
         }
 
+        listenTokenExpired()
         observeRoom()
         observeMessages()
+    }
+
+    private fun listenTokenExpired() {
+        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
+            if(isExpired){
+                Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
+                (activity as MainActivity).handleLogout()
+            }
+        }
     }
 
 

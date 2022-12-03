@@ -1,4 +1,4 @@
-package com.example.securechatapp
+package com.example.securechatapp.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.securechatapp.R
 import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.databinding.ActivityMainBinding
@@ -23,7 +24,6 @@ import com.example.securechatapp.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -146,6 +146,25 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
         resultLauncher.launch(intent)
+    }
+
+    fun handleLogout(){
+
+        Firebase.auth.signOut()
+        Constant.mUID = ""
+
+        with(supportFragmentManager){
+            for(i in 1 .. backStackEntryCount){
+                popBackStack()
+            }
+        }
+
+        addFragment(
+            containerId = getContainerId(),
+            fragment = LoginFragment.newInstance(),
+            addToBackStack = true,
+            tag = getString(R.string.login)
+        )
     }
 
 

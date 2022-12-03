@@ -19,7 +19,7 @@ class HomeFragment : Fragment() {
     }
 
     private var binding: FragmentHomeBinding? = null
-    public var mAdapter: ViewPagerAdapter? = null
+    var mAdapter: ViewPagerAdapter? = null
     private var auth: FirebaseAuth? = null
 
     override fun onCreateView(

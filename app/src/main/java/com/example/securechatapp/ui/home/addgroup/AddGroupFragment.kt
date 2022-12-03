@@ -9,9 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentAddGroupBinding
+import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.utils.InjectorUtils
 
 class AddGroupFragment : Fragment() {
@@ -51,6 +53,17 @@ class AddGroupFragment : Fragment() {
 
             btnConfirm.setOnClickListener {
                 handleConfirmClick()
+            }
+        }
+
+        listenTokenExpired()
+    }
+
+    private fun listenTokenExpired() {
+        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
+            if(isExpired){
+                Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
+                (activity as MainActivity).handleLogout()
             }
         }
     }

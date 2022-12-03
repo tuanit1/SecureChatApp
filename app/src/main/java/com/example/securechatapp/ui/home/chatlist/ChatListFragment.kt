@@ -6,26 +6,23 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.securechatapp.MainActivity
+import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
-import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentChatListBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.home.addgroup.AddGroupFragment
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
-import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.launch
 
 
 class ChatListFragment : Fragment() {
@@ -91,7 +88,7 @@ class ChatListFragment : Fragment() {
             }
 
             override fun onError(t: Throwable?) {
-                Log.e("tuan", "load user image: ${t?.message}")
+                Log.e("tuan", "fail load user image: ${t?.message}")
             }
 
         })
@@ -161,8 +158,18 @@ class ChatListFragment : Fragment() {
         }
 
 
+        listenTokenExpired()
         handleRefreshing()
         handleSearchRoom()
+    }
+
+    private fun listenTokenExpired() {
+        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
+            if(isExpired){
+                Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
+                (activity as MainActivity).handleLogout()
+            }
+        }
     }
 
     private fun handleRefreshing() {

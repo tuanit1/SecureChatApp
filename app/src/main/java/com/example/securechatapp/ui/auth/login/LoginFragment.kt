@@ -2,11 +2,11 @@ package com.example.securechatapp.ui.auth.login
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
@@ -15,7 +15,6 @@ import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.replaceFragment
 import com.example.securechatapp.ui.auth.signup.SignupFragment
 import com.example.securechatapp.ui.home.HomeFragment
-import com.example.securechatapp.ui.home.chatscreen.ChatScreenViewModel
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.google.firebase.auth.FirebaseAuth
@@ -51,7 +50,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun initView() {
-        val factory = InjectorUtils.provideLoginViewModelFactory()
+        val factory = InjectorUtils.provideLoginViewModelFactory(requireContext())
         mViewModel = ViewModelProvider(this, factory)[LoginViewModel::class.java]
     }
 
@@ -78,7 +77,7 @@ class LoginFragment : Fragment() {
             val password: String = edtPass.getText()
 
             if(email.isEmpty() || password.isEmpty()){
-                Toast.makeText(context, "Some field is missing, please check again!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Some field is missing, please check again!", Toast.LENGTH_SHORT).show()
             }else{
                 btnLogin.showProgress(true)
                 auth.signInWithEmailAndPassword(email, password)
@@ -92,7 +91,7 @@ class LoginFragment : Fragment() {
 
                                     override fun onSuccess(data: Any?) {
                                         btnLogin.showProgress(false)
-                                        Toast.makeText(context, "login successfully!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Welcome ${it.result.user?.email}", Toast.LENGTH_SHORT).show()
                                         openHomeFragment()
                                     }
 

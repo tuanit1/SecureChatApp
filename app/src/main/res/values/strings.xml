@@ -18,4 +18,5 @@
     <string name="setting">Setting</string>
     <string name="type_here">Type here</string>
     <string name="no_message_yet">No message yet</string>
+    <string name="author_expired">Authorization has expired, please login again!</string>
 </resources>
