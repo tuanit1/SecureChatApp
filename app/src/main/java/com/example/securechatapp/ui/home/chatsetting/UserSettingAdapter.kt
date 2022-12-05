@@ -13,12 +13,18 @@ import com.squareup.picasso.Picasso
 
 class UserSettingAdapter: ListAdapter<Participant, UserSettingAdapter.ViewHolder>(ParticipantDiffCallback()) {
 
+    var onItemClick: (String) -> Unit = {}
+
     inner class ViewHolder(
         private val binding: LayoutItemSettingUserBinding
     ): RecyclerView.ViewHolder(binding.root){
         fun bind(item: Participant){
             binding.run {
                 tvName.text = item.user.name.decodeBase64()
+
+                root.setOnClickListener {
+                    onItemClick(item.user.uid)
+                }
 
                 if(item.user.image.decodeBase64().isEmpty()){
                     Picasso.get()

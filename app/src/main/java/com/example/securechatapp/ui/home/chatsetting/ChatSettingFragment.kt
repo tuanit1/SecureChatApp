@@ -5,16 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.securechatapp.R
-import com.example.securechatapp.data.model.Participant
 import com.example.securechatapp.databinding.FragmentChatSettingBinding
-import com.example.securechatapp.ui.home.chatscreen.ChatScreenViewModel
+import com.example.securechatapp.ui.home.chatsetting.dialog.UserPrivilegeDialog
 import com.example.securechatapp.utils.InjectorUtils
-import kotlin.math.log
 
 
 class ChatSettingFragment : Fragment() {
@@ -48,6 +44,10 @@ class ChatSettingFragment : Fragment() {
             ivCancel.setOnClickListener {
                 parentFragmentManager.popBackStack()
             }
+        }
+
+        mAdapter?.onItemClick = {
+            UserPrivilegeDialog().show(childFragmentManager, UserPrivilegeDialog.TAG)
         }
 
         observerList()
