@@ -19,4 +19,6 @@
     <string name="type_here">Type here</string>
     <string name="no_message_yet">No message yet</string>
     <string name="author_expired">Authorization has expired, please login again!</string>
+    <string name="user_privileges">User privileges</string>
+    <string name="add_member">Add member</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.securechatapp.ui.auth.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.APICallback
@@ -25,6 +26,7 @@ class LoginViewModel(
                 ) {
                     if(response.isSuccessful && response.body()?.success == true){
                         response.body()?.data?.let { authToken ->
+                            Log.e("tuan", "Bearer ${authToken.accessToken}")
                             localRepository.saveAccessToken(authToken.accessToken)
                             localRepository.saveRefreshToken(authToken.refreshToken)
                             callback.onSuccess()

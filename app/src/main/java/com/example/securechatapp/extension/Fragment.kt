@@ -29,7 +29,7 @@ fun Fragment.addFragment(
     tag: String
 ) {
     if (parentFragmentManager.findFragmentByTag(tag) == null) {
-        parentFragmentManager.commit {
+         parentFragmentManager.commit {
             add(containerId, fragment, tag)
             if (addToBackStack) {
                 addToBackStack(tag)

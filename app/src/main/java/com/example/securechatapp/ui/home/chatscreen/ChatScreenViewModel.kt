@@ -40,6 +40,7 @@ class ChatScreenViewModel(
     var mMessages: MutableLiveData<List<ChatMessage>> = MutableLiveData()
     var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
     var isAddToTop: Boolean = false
+    var isDownload: Boolean = false
     private var mPage = 0
     private var mStep = 10
 
@@ -88,7 +89,6 @@ class ChatScreenViewModel(
 
                 })
         }
-
     }
 
     fun loadMessage(roomID: String, callback: APICallback? = null) {
@@ -169,6 +169,7 @@ class ChatScreenViewModel(
     }
 
     fun sendTextMessage(text: String, roomID: String, onFinish: () -> Unit) {
+
 
         val body = HashMap<String, String>().apply {
             set("message", text.encodeBase64())
@@ -491,6 +492,7 @@ class ChatScreenViewModel(
     }
 
     fun setMessageDownloadState(messageID: String, isDownloaded: Boolean) {
+        isDownload = true
         mMessages.value = mMessages.value?.toMutableList()?.apply {
             forEachIndexed { index, chatMessage ->
                 if (chatMessage.message.id == messageID) {

@@ -12,14 +12,16 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.databinding.FragmentChatScreenBinding
+import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.decodeBase64
+import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
+import com.example.securechatapp.ui.home.chatsetting.ChatSettingFragment
 import com.example.securechatapp.utils.InjectorUtils
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -128,6 +130,11 @@ class ChatScreenFragment : Fragment() {
         }
 
         binding?.run {
+
+            ivRoomSetting.setOnClickListener {
+                openChatSettingScreen()
+            }
+
             edtMessage.addTextChangedListener { text ->
 
                 ivSendMessage.visibility = View.VISIBLE
@@ -267,9 +274,11 @@ class ChatScreenFragment : Fragment() {
                 if (list?.isNotEmpty() == true) {
                     mAdapter?.submitList(list)
 
-                    if (mViewModel?.isAddToTop == false) {
+                    if (mViewModel?.isAddToTop == false && mViewModel?.isDownload == false) {
                         binding?.rv?.smoothScrollToPosition(list.size - 1)
                     }
+
+                    mViewModel?.isDownload = false
 
                 }
             }
@@ -366,6 +375,15 @@ class ChatScreenFragment : Fragment() {
                 }
             })
         }
+    }
+
+    private fun openChatSettingScreen(){
+        addFragment(
+            R.id.fragmentContainerView,
+            ChatSettingFragment.newInstance(),
+            true,
+            ChatSettingFragment::class.java.name
+        )
     }
 
     override fun onResume() {
