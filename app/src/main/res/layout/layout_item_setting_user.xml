@@ -33,8 +33,6 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/tvState"
-        app:layout_constraintEnd_toStartOf="@+id/ivEdit"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/ivUser"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
@@ -73,6 +71,18 @@
         android:layout_marginHorizontal="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/chineseWhite"/>
+
+    <ImageView
+        android:id="@+id/ivAdmin"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvName"
+        app:layout_constraintEnd_toStartOf="@+id/ivEdit"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/tvName"
+        app:layout_constraintTop_toTopOf="@+id/tvName"
+        android:src="@drawable/ic_key"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

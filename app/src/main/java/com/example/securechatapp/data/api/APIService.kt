@@ -4,17 +4,18 @@ import com.example.securechatapp.data.model.*
 import com.example.securechatapp.data.model.api.AuthToken
 import com.example.securechatapp.data.model.api.ResponseObject
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 
 interface APIService {
 
     //AUTH
     @POST("auth/login/{uid}")
     fun getAuthToken(@Path("uid") uid: String): Call<ResponseObject<AuthToken>>
+
+    @PUT("auth/logout")
+    suspend fun logoutToken()
 
     @POST("auth/token")
     fun refreshToken(@Body body: HashMap<String, String>): Call<ResponseObject<AuthToken>>
@@ -36,7 +37,7 @@ interface APIService {
     suspend fun getPrivateRoom(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String): ResponseObject<ChatRoom>
 
     @GET("room/{uid}&{roomID}")
-    fun getRoomByID(@Path("uid") uid: String, @Path("roomID") roomID: String): Call<ResponseObject<ChatRoom>>
+    suspend fun getRoomByID(@Path("uid") uid: String, @Path("roomID") roomID: String): Response<ResponseObject<ChatRoom>>
 
     //USER
     @GET("user")
@@ -55,13 +56,23 @@ interface APIService {
         @Path("roomId") roomId: String,
     ): Response<ResponseObject<Participant>>
 
+
+    @GET("participant/room/{roomID}")
+    fun getParticipantByRoomID(@Path("roomID") roomID: String) : Call<ResponseObject<List<Participant>>>
+
+    @GET("participant/room/{roomID}")
+    suspend fun getParticipantByRoomIDSuspend(@Path("roomID") roomID: String): Response<ResponseObject<List<Participant>>>
+
+    @PUT("participant/{id}")
+    fun updateParticipant(@Path("id") id: String, @Body body: HashMap<String, String>): Call<ResponseObject<Any>>
+
     //MESSAGE
     @GET("message/page/{roomID}&{page}&{step}")
-    fun getMessagesByRoomID(
+    suspend fun getMessagesByRoomID(
         @Path("roomID") roomID: String,
         @Path("page") page: Int,
         @Path("step") step: Int
-    ): Call<ResponseObject<List<ChatMessage>>>
+    ): Response<ResponseObject<List<ChatMessage>>>
 
     @POST("message/{uid}&{roomID}")
     fun createMessage(
@@ -69,5 +80,6 @@ interface APIService {
         @Path("roomID") roomID: String,
         @Body body: HashMap<String, String>
     ): Call<ResponseObject<Message>>
+
 
 }

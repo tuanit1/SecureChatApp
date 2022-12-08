@@ -8,13 +8,17 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.securechatapp.R
+import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.Message
+import com.example.securechatapp.data.model.Participant
 import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.ui.auth.login.LoginFragment
@@ -24,6 +28,7 @@ import com.example.securechatapp.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private var onPermissionGranted: () -> Unit = {}
     var chatScreenHandleMessage: (ChatMessage) -> Unit = {}
     var chatListHandleMessage: (Message) -> Unit = {}
+    var chatSettingHandleParticipant: (Participant) -> Unit = {}
     var onActivityResultListener : (data: Intent?) -> Unit = {}
     var imageUri: Uri? = null
 
@@ -43,11 +49,18 @@ class MainActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        AppSocket.getInstance().mSocket.connect()
-
         initView()
         initListener()
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        AppSocket.getInstance().run {
+            mSocketMessage.connect()
+            mSocketParticipant.connect()
+        }
     }
 
     private fun initListener() {
@@ -62,9 +75,15 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        AppSocket.getInstance().onListenMessage = {
-            chatScreenHandleMessage(it)
-            chatListHandleMessage(it.message)
+        AppSocket.getInstance().run {
+            onListenMessage = {
+                chatScreenHandleMessage(it)
+                chatListHandleMessage(it.message)
+            }
+
+            onListenParticipant = {
+                chatSettingHandleParticipant(it)
+            }
         }
     }
 
@@ -153,6 +172,14 @@ class MainActivity : AppCompatActivity() {
         Firebase.auth.signOut()
         Constant.mUID = ""
 
+        lifecycleScope.launch {
+            try{
+                API.apiService.logoutToken()
+            }catch (e: Exception) {
+                Log.e("tuan", e.message.toString())
+            }
+        }
+
         with(supportFragmentManager){
             for(i in 1 .. backStackEntryCount){
                 popBackStack()
@@ -170,7 +197,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        AppSocket.getInstance().mSocket.disconnect()
+        AppSocket.getInstance().run {
+            mSocketMessage.disconnect()
+            mSocketParticipant.disconnect()
+        }
     }
 
     private fun getContainerId() = R.id.fragmentContainerView

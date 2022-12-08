@@ -5,7 +5,10 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white"
-    tools:context=".ui.home.addgroup.AddGroupFragment">
+    tools:context=".ui.home.addgroup.AddGroupFragment"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -75,29 +78,46 @@
             android:id="@+id/tvConfirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:text="@string/add_member"
+            android:layout_marginEnd="20dp"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageView3"
+            app:layout_constraintEnd_toStartOf="@+id/rlImage"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/imageView3"
+        <RelativeLayout
+            android:id="@+id/rlImage"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/tvConfirm"
             app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/ic_plus"/>
+            android:src="@drawable/ic_plus">
+            <ImageView
+                android:id="@+id/ivPlus"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:visibility="gone"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_plus"/>
+
+            <ImageView
+                android:id="@+id/ivOut"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                app:tint="@color/ghostWhite"
+                android:visibility="gone"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_logout"/>
+        </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView

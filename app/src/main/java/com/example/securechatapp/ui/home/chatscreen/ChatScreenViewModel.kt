@@ -14,8 +14,10 @@ import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.ChatRoom
 import com.example.securechatapp.data.model.Message
+import com.example.securechatapp.data.model.Participant
 import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.MessageRepository
+import com.example.securechatapp.data.repository.ParticipantRepository
 import com.example.securechatapp.data.repository.RoomRepository
 import com.example.securechatapp.extension.*
 import com.example.securechatapp.utils.Constant
@@ -33,12 +35,14 @@ import java.net.URLConnection
 @Suppress("DEPRECATION")
 class ChatScreenViewModel(
     private val roomRepository: RoomRepository,
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
+    private val participantRepository: ParticipantRepository
 ) : ViewModel() {
 
     var mChatRoom: MutableLiveData<ChatRoom> = MutableLiveData()
     var mMessages: MutableLiveData<List<ChatMessage>> = MutableLiveData()
     var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
+    var mParticipant: MutableLiveData<Participant> = MutableLiveData()
     var isAddToTop: Boolean = false
     var isDownload: Boolean = false
     private var mPage = 0
@@ -49,46 +53,85 @@ class ChatScreenViewModel(
             viewModelScope.launch(Dispatchers.Main) {
                 callback.onStart()
             }
-            roomRepository.getRoomByID(Constant.mUID, roomID)
-                .enqueue(object : Callback<ResponseObject<ChatRoom>> {
-                    override fun onResponse(
-                        call: Call<ResponseObject<ChatRoom>>,
-                        response: Response<ResponseObject<ChatRoom>>
-                    ) {
-                        API.checkTokenExpired(
-                            response,
-                            onTokenInUse = {
-                                if (response.isSuccessful) {
-                                    if (response.body()?.success == true) {
-                                        response.body()?.data?.let {
-                                            mChatRoom.postValue(it)
-                                            viewModelScope.launch(Dispatchers.Main) {
-                                                callback.onSuccess()
-                                            }
-                                        }
+            roomRepository.getRoomByID (Constant.mUID, roomID)
+            .enqueue(object : Callback<ResponseObject<ChatRoom>> {
+            override fun onResponse(
+                call: Call<ResponseObject<ChatRoom>>,
+                response: Response<ResponseObject<ChatRoom>>
+            ) {
+                API.checkTokenExpired(
+                    response,
+                    onTokenInUse = {
+                        if (response.isSuccessful) {
+                            if (response.body()?.success == true) {
+                                response.body()?.data?.let {
+                                    mChatRoom.postValue(it)
+                                    viewModelScope.launch(Dispatchers.Main) {
+                                        callback.onSuccess()
                                     }
                                 }
-                            },
-                            onTokenUpdated = {
-                                loadRoom(roomID, callback)
-                            },
-                            onRefreshTokenExpired = {
-                                isTokenExpired.value = true
-                            },
-                            onError = { callback.onError() }
-                        )
-
-                    }
-
-                    override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
-                        Log.d("tuan", "load room of chat screen fail")
-                        viewModelScope.launch(Dispatchers.Main) {
-                            callback.onError(t)
+                            }
                         }
-                    }
+                    },
+                    onTokenUpdated = {
+                        loadRoom(roomID, callback)
+                    },
+                    onRefreshTokenExpired = {
+                        isTokenExpired.value = true
+                    },
+                    onError = { callback.onError() }
+                )
 
-                })
+            }
+
+            override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
+                Log.d("tuan", "load room of chat screen fail")
+                viewModelScope.launch(Dispatchers.Main) {
+                    callback.onError(t)
+                }
+            }
+
+        })
         }
+    }
+
+    fun loadParticipant(roomID: String) {
+        participantRepository.getRoomParticipants(roomID)
+            .enqueue(object : Callback<ResponseObject<List<Participant>>> {
+                override fun onResponse(
+                    call: Call<ResponseObject<List<Participant>>>,
+                    response: Response<ResponseObject<List<Participant>>>
+                ) {
+                    API.checkTokenExpired(
+                        response,
+                        onTokenInUse = {
+                            if (response.isSuccessful && response.body()?.success == true) {
+                                response.body()?.data?.let { list ->
+                                    mParticipant.value = list.find { it.user.uid == Constant.mUID }
+                                    Log.e("tuan", "Load chat screen participant success")
+                                }
+                            }
+                        },
+                        onTokenUpdated = {
+                            loadParticipant(roomID)
+                        },
+                        onRefreshTokenExpired = {
+                            isTokenExpired.value = true
+                        },
+                        onError = {
+                            Log.e("tuan", "Load chat screen participant fail")
+                        }
+                    )
+                }
+
+                override fun onFailure(
+                    call: Call<ResponseObject<List<Participant>>>,
+                    t: Throwable
+                ) {
+                    Log.e("tuan", t.message.toString())
+                }
+
+            })
     }
 
     fun loadMessage(roomID: String, callback: APICallback? = null) {
@@ -96,68 +139,56 @@ class ChatScreenViewModel(
             viewModelScope.launch(Dispatchers.Main) {
                 callback?.onStart()
             }
-            messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
-                .enqueue(object : Callback<ResponseObject<List<ChatMessage>>> {
-                    override fun onResponse(
-                        call: Call<ResponseObject<List<ChatMessage>>>,
-                        response: Response<ResponseObject<List<ChatMessage>>>
-                    ) {
+            val response = messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
 
-                        API.checkTokenExpired(
-                            response,
-                            onTokenInUse = {
-                                if (response.body()?.success == true) {
+            API.checkTokenExpired(
+                response,
+                onTokenInUse = {
+                    if (response.body()?.success == true) {
 
-                                    response.body()?.data?.let { list ->
-                                        if (list.isNotEmpty()) {
-                                            checkFileMessageDownload(list)
+                        response.body()?.data?.let { list ->
+                            if (list.isNotEmpty()) {
+                                checkFileMessageDownload(list)
 
-                                            if (mMessages.value != null) {
-                                                isAddToTop = true
-                                                mMessages.value =
-                                                    mMessages.value?.toMutableList()?.apply {
-                                                        addAll(0, list)
-                                                    }
-                                            } else {
-                                                isAddToTop = false
-
-                                                mMessages.value = list
-                                            }
-
-                                            mPage++
-                                            Log.e("tuan", "${list.size} more messages added")
+                                if (mMessages.value != null) {
+                                    isAddToTop = true
+                                    mMessages.value =
+                                        mMessages.value?.toMutableList()?.apply {
+                                            addAll(0, list)
                                         }
-                                    }
-
-                                    viewModelScope.launch(Dispatchers.Main) {
-                                        callback?.onSuccess()
-                                    }
                                 } else {
-                                    viewModelScope.launch(Dispatchers.Main) {
-                                        callback?.onError()
-                                    }
+                                    isAddToTop = false
+
+                                    mMessages.value = list
                                 }
-                            },
-                            onTokenUpdated = {
-                                loadMessage(roomID, callback)
-                            },
-                            onRefreshTokenExpired = {
-                                isTokenExpired.value = true
-                            },
-                            onError = { callback?.onError() }
-                        )
 
+                                mPage++
+                                Log.e("tuan", "${list.size} more messages added")
+                            }
+                        }
 
+                        viewModelScope.launch(Dispatchers.Main) {
+                            callback?.onSuccess()
+                        }
+                    } else {
+                        viewModelScope.launch(Dispatchers.Main) {
+                            callback?.onError()
+                        }
                     }
-
-                    override fun onFailure(
-                        call: Call<ResponseObject<List<ChatMessage>>>,
-                        t: Throwable
-                    ) {
-                        callback?.onError(t)
+                },
+                onTokenUpdated = {
+                    loadMessage(roomID, callback)
+                },
+                onRefreshTokenExpired = {
+                    isTokenExpired.value = true
+                },
+                onError = {
+                    viewModelScope.launch(Dispatchers.Main) {
+                        callback?.onError()
                     }
+                }
+            )
 
-                })
         }
     }
 

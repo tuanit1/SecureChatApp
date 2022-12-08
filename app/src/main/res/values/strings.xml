@@ -21,4 +21,9 @@
     <string name="author_expired">Authorization has expired, please login again!</string>
     <string name="user_privileges">User privileges</string>
     <string name="add_member">Add member</string>
+    <string name="kick">Kick</string>
+    <string name="update">Update</string>
+    <string name="send_message">Send message</string>
+    <string name="view_file">View file</string>
+    <string name="exit_room">Exit room</string>
 </resources>

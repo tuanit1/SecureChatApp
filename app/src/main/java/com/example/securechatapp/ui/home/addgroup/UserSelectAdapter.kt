@@ -28,12 +28,12 @@ class UserListAdapter(
 
                 if(item.image.decodeBase64().isEmpty()){
                     Picasso.get()
-                        .load(R.drawable.ic_user_placholder)
+                        .load(R.drawable.ic_user_placeholder2)
                         .into(ivUser)
                 }else{
                     Picasso.get()
                         .load(item.image.decodeBase64())
-                        .placeholder(R.drawable.ic_user_placholder)
+                        .placeholder(R.drawable.ic_user_placeholder2)
                         .into(ivUser)
                 }
 

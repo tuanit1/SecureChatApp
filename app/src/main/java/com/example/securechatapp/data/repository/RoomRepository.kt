@@ -5,5 +5,5 @@ import com.example.securechatapp.data.api.API
 class RoomRepository {
     suspend fun createPrivateRoom(currentUID: String, otherUID: String) = API.apiService.createPrivateRoom(currentUID, otherUID)
     suspend fun getPrivateRoom(currentUID: String, otherUID: String) = API.apiService.getPrivateRoom(currentUID, otherUID)
-    fun getRoomByID(uid: String, roomID: String) = API.apiService.getRoomByID(uid, roomID)
+    suspend fun getRoomByID(uid: String, roomID: String) = API.apiService.getRoomByID(uid, roomID)
 }

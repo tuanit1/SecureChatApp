@@ -72,7 +72,7 @@ class AddGroupFragment : Fragment() {
         binding?.run {
             val groupName = edtGroupName.text
 
-            if (groupName?.isEmpty() == null) {
+            if (groupName?.isEmpty() == true) {
                 edtGroupName.error = "Please enter group name!"
             } else {
                 binding?.btnProgress?.visibility = View.VISIBLE

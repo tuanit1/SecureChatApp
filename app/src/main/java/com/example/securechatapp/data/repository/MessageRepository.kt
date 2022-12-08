@@ -3,7 +3,7 @@ package com.example.securechatapp.data.repository
 import com.example.securechatapp.data.api.API
 
 class MessageRepository {
-    fun getMessagesByRoomID(
+    suspend fun getMessagesByRoomID(
         roomUID: String,
         page: Int,
         step: Int

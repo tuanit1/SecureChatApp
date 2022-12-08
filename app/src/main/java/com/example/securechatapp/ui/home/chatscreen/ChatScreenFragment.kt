@@ -374,13 +374,15 @@ class ChatScreenFragment : Fragment() {
                     binding?.clTitle?.visibility = View.VISIBLE
                 }
             })
+
+            mViewModel?.loadParticipant(it)
         }
     }
 
     private fun openChatSettingScreen(){
         addFragment(
             R.id.fragmentContainerView,
-            ChatSettingFragment.newInstance(),
+            ChatSettingFragment.newInstance(mRoomID),
             true,
             ChatSettingFragment::class.java.name
         )

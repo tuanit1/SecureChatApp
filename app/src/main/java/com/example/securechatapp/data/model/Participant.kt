@@ -14,5 +14,11 @@ data class Participant(
     var isAdmin: Boolean,
     var allowSendMSG: Boolean,
     var allowSendFile: Boolean,
-    var allowViewFile: Boolean
-)
+    var allowViewFile: Boolean,
+    var action: String?
+){
+    companion object{
+        const val UPDATE_ACTION = "update"
+        const val ADD_ACTION = "add"
+    }
+}

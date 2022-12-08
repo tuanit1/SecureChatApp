@@ -1,6 +1,7 @@
 package com.example.securechatapp.ui.home.chatsetting
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -13,7 +14,7 @@ import com.squareup.picasso.Picasso
 
 class UserSettingAdapter: ListAdapter<Participant, UserSettingAdapter.ViewHolder>(ParticipantDiffCallback()) {
 
-    var onItemClick: (String) -> Unit = {}
+    var onItemClick: (Participant) -> Unit = {}
 
     inner class ViewHolder(
         private val binding: LayoutItemSettingUserBinding
@@ -22,18 +23,47 @@ class UserSettingAdapter: ListAdapter<Participant, UserSettingAdapter.ViewHolder
             binding.run {
                 tvName.text = item.user.name.decodeBase64()
 
-                root.setOnClickListener {
-                    onItemClick(item.user.uid)
+                if(item.isAdmin){
+                    ivEdit.visibility = View.GONE
+                    ivAdmin.visibility = View.VISIBLE
+                }else{
+                    ivEdit.visibility = View.VISIBLE
+                    ivAdmin.visibility = View.GONE
                 }
+
+                ivEdit.setOnClickListener {
+                    if (!item.isAdmin) {
+                        onItemClick(item)
+                    }
+
+                }
+
+                var count = 0
+
+                if(item.allowViewFile){
+                    count++
+                }
+                if(item.allowSendFile){
+                    count++
+                }
+                if(item.allowSendMSG){
+                    count++
+                }
+
+                tvState.text = buildString {
+                    append(count)
+                    append("/3 privileges")
+                }
+
 
                 if(item.user.image.decodeBase64().isEmpty()){
                     Picasso.get()
-                        .load(R.drawable.ic_user_placholder)
+                        .load(R.drawable.ic_user_placeholder2)
                         .into(ivUser)
                 }else{
                     Picasso.get()
                         .load(item.user.image.decodeBase64())
-                        .placeholder(R.drawable.ic_user_placholder)
+                        .placeholder(R.drawable.ic_user_placeholder2)
                         .into(ivUser)
                 }
             }

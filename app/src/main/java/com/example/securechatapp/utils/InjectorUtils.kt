@@ -31,7 +31,9 @@ object InjectorUtils {
     fun provideChatScreenViewModelFactory(): ChatScreenViewModelFactory {
         val messageRepository = MessageRepository()
         val roomRepository = RoomRepository()
-        return ChatScreenViewModelFactory(roomRepository, messageRepository)
+        val participantRepository = ParticipantRepository()
+
+        return ChatScreenViewModelFactory(roomRepository, messageRepository, participantRepository)
     }
 
     fun provideLoginViewModelFactory(context: Context): LoginViewModelFactory {
@@ -39,7 +41,7 @@ object InjectorUtils {
         return LoginViewModelFactory(localRepository)
     }
 
-    fun provideChatSettingViewModelFactory(): ChatSettingViewModelFactory{
+    fun provideChatSettingViewModelFactory(): ChatSettingViewModelFactory {
         val participantRepository = ParticipantRepository()
         return ChatSettingViewModelFactory(participantRepository)
     }

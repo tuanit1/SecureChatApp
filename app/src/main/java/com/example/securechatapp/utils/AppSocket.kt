@@ -2,18 +2,19 @@ package com.example.securechatapp.utils
 
 import android.util.Log
 import com.example.securechatapp.data.model.ChatMessage
+import com.example.securechatapp.data.model.Participant
 import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
 
 class AppSocket private constructor(){
-
-    var mSocket: Socket = IO.socket("http://${Constant.SERVER_URL}:8080/message")
+    var mSocketMessage: Socket = IO.socket("http://${Constant.SERVER_URL}:8080/message")
+    var mSocketParticipant: Socket = IO.socket("http://${Constant.SERVER_URL}:8080/participant")
     var onListenMessage: (ChatMessage) -> Unit  = {}
+    var onListenParticipant: (Participant) -> Unit = {}
 
     init {
-        mSocket.on(ON_MESSAGE) {
-
+        mSocketMessage.on(ON_MESSAGE) {
             try {
                 val jsonString = it[0].toString()
                 val chatMessage = Gson().fromJson(jsonString, ChatMessage::class.java)
@@ -25,15 +26,26 @@ class AppSocket private constructor(){
 
         }
 
-        mSocket.on(Socket.EVENT_CONNECT_ERROR){
+        mSocketParticipant.on(ON_PARTICIPANT){
+            try {
+                val jsonString = it[0].toString()
+                val participant = Gson().fromJson(jsonString, Participant::class.java)
+
+                onListenParticipant(participant)
+            }catch (e: Exception){
+                Log.e("tuan", e.message.toString())
+            }
+        }
+
+        mSocketMessage.on(Socket.EVENT_CONNECT_ERROR){
             Log.e("tuan", "SocketIO Err")
         }
 
-        mSocket.on(Socket.EVENT_CONNECT){
+        mSocketMessage.on(Socket.EVENT_CONNECT){
             Log.e("tuan", "SocketIO connected")
         }
 
-        mSocket.on(Socket.EVENT_DISCONNECT){
+        mSocketMessage.on(Socket.EVENT_DISCONNECT){
             Log.e("tuan", "SocketIO disconnected")
         }
 
@@ -44,6 +56,7 @@ class AppSocket private constructor(){
     companion object {
 
         const val ON_MESSAGE = "message"
+        const val ON_PARTICIPANT = "participant"
 
         @JvmStatic
         fun getInstance(): AppSocket{
