@@ -8,7 +8,8 @@
     tools:context=".ui.home.addgroup.AddGroupFragment"
     android:clickable="true"
     android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    tools:ignore="ContentDescription">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -94,29 +95,30 @@
             android:id="@+id/rlImage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_plus"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="w,1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/tvConfirm"
-            app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/ic_plus">
+            app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/ivPlus"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
-                android:visibility="gone"
                 android:adjustViewBounds="true"
-                android:src="@drawable/ic_plus"/>
+                android:src="@drawable/ic_plus"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/ivOut"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                app:tint="@color/ghostWhite"
-                android:visibility="gone"
                 android:adjustViewBounds="true"
-                android:src="@drawable/ic_logout"/>
+                android:src="@drawable/ic_logout"
+                android:visibility="gone"
+                app:tint="@color/ghostWhite" />
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

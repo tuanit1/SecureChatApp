@@ -1,5 +1,6 @@
 package com.example.securechatapp.ui.home.chatscreen
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.viewbinding.ViewBinding
 import com.example.securechatapp.R
 import com.example.securechatapp.data.model.ChatMessage
 import com.example.securechatapp.data.model.Message
+import com.example.securechatapp.data.model.Participant
 import com.example.securechatapp.databinding.LayoutItemMessageLeftBinding
 import com.example.securechatapp.databinding.LayoutItemMessageRightBinding
 import com.example.securechatapp.databinding.LayoutMessageFileBinding
@@ -34,6 +36,8 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
         ProgressBar,
         ImageView
     ) -> Unit = {_,_,_,_ ->}
+
+    private var isShowFile: Boolean = true
 
     inner class ViewHolder(
         private val mBinding: ViewBinding
@@ -73,7 +77,13 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
                                 layoutFile.root.visibility = View.GONE
 
                                 val urlImage = item.message.decodeBase64()
-                                if(urlImage.isNotEmpty()){
+
+
+                                if(!isShowFile){
+                                    Picasso.get()
+                                        .load(R.drawable.img_not_allow)
+                                        .into(ivMessage)
+                                } else if(urlImage.isNotEmpty()){
                                     Picasso.get()
                                         .load(urlImage)
                                         .placeholder(R.drawable.img_photo_placeholder)
@@ -136,7 +146,11 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
                             layoutFile.root.visibility = View.GONE
 
                             val urlImage = item.message.decodeBase64()
-                            if(urlImage.isNotEmpty()){
+                            if(!isShowFile){
+                                Picasso.get()
+                                    .load(R.drawable.img_not_allow)
+                                    .into(ivMessage)
+                            } else if(urlImage.isNotEmpty()){
                                 Picasso.get()
                                     .load(urlImage)
                                     .placeholder(R.drawable.img_photo_placeholder)
@@ -166,12 +180,19 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
             item: Message
         ){
             layoutFile.run {
-                tvFileName.text = item.message.decodeBase64()
+
+                if(isShowFile){
+                    tvFileName.text = item.message.decodeBase64()
+                    ivDownload.visibility =  View.VISIBLE
+                }else{
+                    tvFileName.text = itemView.context.getString(R.string.str_not_allow_view_file)
+                    ivDownload.visibility =  View.GONE
+                }
+
                 progressBar.visibility = View.GONE
-                ivDownload.visibility = View.VISIBLE
                 ivDownload.isSelected = item.isDownloaded
                 ivDownload.setOnClickListener {
-                    if(!item.isDownloaded){
+                    if(!item.isDownloaded && isShowFile){
                         onDownloadClickListener(
                             item.id,
                             item.message.decodeBase64(),
@@ -205,6 +226,20 @@ class ChatScreenAdapter: ListAdapter<ChatMessage, ChatScreenAdapter.ViewHolder>(
                     }
                 }
 
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setShowFile(participant: Participant){
+
+        if(participant.allowViewFile != isShowFile){
+            isShowFile = participant.allowViewFile
+
+            currentList.forEachIndexed { index, chatMessage ->
+                if (chatMessage.message.type == Message.IMAGE || chatMessage.message.type == Message.FILE) {
+                    notifyItemChanged(index)
+                }
             }
         }
     }

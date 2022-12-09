@@ -43,6 +43,7 @@ class ChatScreenViewModel(
     var mMessages: MutableLiveData<List<ChatMessage>> = MutableLiveData()
     var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
     var mParticipant: MutableLiveData<Participant> = MutableLiveData()
+    var isFirstLoad: Boolean = true
     var isAddToTop: Boolean = false
     var isDownload: Boolean = false
     private var mPage = 0
@@ -60,12 +61,12 @@ class ChatScreenViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val roomResponse = roomRepository.getRoomByID(Constant.mUID, roomID)
             val messageResponse = messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
-            val messageResponseFixThat = messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
+            val partyResponse = participantRepository.getParticipantByRoomIDSuspend(roomID)
 
             API.checkTokenExpiredThreeRequest(
                 roomResponse,
                 messageResponse,
-                messageResponseFixThat,
+                partyResponse,
                 onTokenInUse = {
                     //handle room
                     if (roomResponse.isSuccessful) {
@@ -73,6 +74,15 @@ class ChatScreenViewModel(
                             roomResponse.body()?.data?.let {
                                 mChatRoom.postValue(it)
                                 roomCallback.onSuccess()
+                            }
+                        }
+                    }
+
+                    //handle participant
+                    if(partyResponse.body()?.success == true){
+                        partyResponse.body()?.data?.let { list ->
+                            if(list.isNotEmpty()){
+                                mParticipant.value = list.find { it.user.uid == Constant.mUID }
                             }
                         }
                     }
@@ -106,6 +116,8 @@ class ChatScreenViewModel(
                         messageCallback.onError()
                     }
 
+                    isFirstLoad = false
+
                 },
                 onTokenUpdated = {
                     fetchScreenData(roomID, roomCallback, messageCallback)
@@ -119,38 +131,6 @@ class ChatScreenViewModel(
                 }
             )
 
-        }
-
-    }
-
-
-    fun loadParticipant(roomID: String) {
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = participantRepository.getParticipantByRoomIDSuspend(roomID)
-
-            API.checkTokenExpired(
-                response,
-                onTokenInUse = {
-                    if (response.body()?.success == true) {
-
-                        response.body()?.data?.let { list ->
-                            if (list.isNotEmpty()) {
-
-                            }
-                        }
-
-                    }
-                },
-                onTokenUpdated = {
-                    loadParticipant(roomID)
-                },
-                onRefreshTokenExpired = {
-                    isTokenExpired.value = true
-                },
-                onError = {
-                }
-            )
         }
 
     }
@@ -555,6 +535,10 @@ class ChatScreenViewModel(
                 }
             }
         }
+    }
+
+    fun setParticipantUpdateFromSocket(party: Participant){
+        mParticipant.postValue(party)
     }
 
 }

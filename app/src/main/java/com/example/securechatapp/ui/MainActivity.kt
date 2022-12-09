@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     var chatScreenHandleMessage: (ChatMessage) -> Unit = {}
     var chatListHandleMessage: (Message) -> Unit = {}
     var chatSettingHandleParticipant: (Participant) -> Unit = {}
+    var chatScreenHandleParticipant: (Participant) -> Unit = {}
     var onActivityResultListener : (data: Intent?) -> Unit = {}
     var imageUri: Uri? = null
 
@@ -83,6 +84,7 @@ class MainActivity : AppCompatActivity() {
 
             onListenParticipant = {
                 chatSettingHandleParticipant(it)
+                chatScreenHandleParticipant(it)
             }
         }
     }

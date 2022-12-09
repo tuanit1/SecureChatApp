@@ -49,6 +49,8 @@ class ChatScreenFragment : Fragment() {
     private var mViewModel: ChatScreenViewModel? = null
     private var mAdapter: ChatScreenAdapter? = null
     private var resultCode: String? = null
+    private var isAllowToSendFile: Boolean = true
+    private var isAllowToSendMessage: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -154,13 +156,19 @@ class ChatScreenFragment : Fragment() {
 
             ivSendMessage.setOnClickListener {
                 if (!isEmptyInput) {
-                    mRoomID?.let {
-                        progressBarMsg.visibility = View.VISIBLE
-                        mViewModel?.sendTextMessage(edtMessage.text.toString(), it) {
-                            progressBarMsg.visibility = View.GONE
+                    if(isAllowToSendMessage){
+                        mRoomID?.let {
+                            progressBarMsg.visibility = View.VISIBLE
+                            mViewModel?.sendTextMessage(edtMessage.text.toString(), it) {
+                                progressBarMsg.visibility = View.GONE
+                            }
+                            edtMessage.text.clear()
                         }
+                    }else{
+                        Toast.makeText(context, "You are not allow to send message!", Toast.LENGTH_SHORT).show()
                         edtMessage.text.clear()
                     }
+
                 } else {
                     llSendMore.visibility = View.VISIBLE
                     ivSendMessage.visibility = View.GONE
@@ -169,27 +177,41 @@ class ChatScreenFragment : Fragment() {
 
             btnTakePhoto.setOnClickListener {
                 (activity as MainActivity).run {
-                    checkUserPermission(Manifest.permission.CAMERA) {
-                        resultCode = TAKE_PHOTO_REQUEST
-                        getImageFromCamera()
+                    if(isAllowToSendFile){
+                        checkUserPermission(Manifest.permission.CAMERA) {
+                            resultCode = TAKE_PHOTO_REQUEST
+                            getImageFromCamera()
+                        }
+                    }else{
+                        Toast.makeText(context, "You are not allow to send image!", Toast.LENGTH_SHORT).show()
                     }
+
                 }
             }
 
             btnPickPhoto.setOnClickListener {
                 (activity as MainActivity).run {
-                    checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                        resultCode = PICK_IMAGE_REQUEST
-                        pickImageFromGallery()
+                    if(isAllowToSendFile){
+                        checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                            resultCode = PICK_IMAGE_REQUEST
+                            pickImageFromGallery()
+                        }
+                    }else{
+                        Toast.makeText(context, "You are not allow to send image!", Toast.LENGTH_SHORT).show()
+
                     }
                 }
             }
 
             btnPickFile.setOnClickListener {
                 (activity as MainActivity).run {
-                    checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
-                        resultCode = PICK_FILE_REQUEST
-                        pickFileFromStorage()
+                    if(isAllowToSendFile){
+                        checkUserPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) {
+                            resultCode = PICK_FILE_REQUEST
+                            pickFileFromStorage()
+                        }
+                    }else{
+                        Toast.makeText(context, "You are not allow to send file!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -255,6 +277,14 @@ class ChatScreenFragment : Fragment() {
         listenTokenExpired()
         observeRoom()
         observeMessages()
+        observeParticipant()
+        listenParticipantFromSocket()
+    }
+
+    private fun listenParticipantFromSocket() {
+        (activity as MainActivity).chatScreenHandleParticipant = {
+            mViewModel?.setParticipantUpdateFromSocket(it)
+        }
     }
 
     private fun listenTokenExpired() {
@@ -266,6 +296,15 @@ class ChatScreenFragment : Fragment() {
         }
     }
 
+
+    private fun observeParticipant() {
+        mViewModel?.mParticipant?.observe(viewLifecycleOwner){
+            mAdapter?.setShowFile(it)
+
+            isAllowToSendMessage = it.allowSendMSG
+            isAllowToSendFile = it.allowSendFile
+        }
+    }
 
     private fun observeMessages() {
         binding?.run {
@@ -296,6 +335,8 @@ class ChatScreenFragment : Fragment() {
                             append(Room.GROUP)
                         }
 
+                        ivRoomSetting.visibility = View.VISIBLE
+
                         chatRoom?.room?.image?.decodeBase64()?.let { url ->
                             if (url.isNotEmpty()) {
                                 Picasso.get()
@@ -316,6 +357,8 @@ class ChatScreenFragment : Fragment() {
                             append("@")
                             append(Room.PRIVATE)
                         }
+
+                        ivRoomSetting.visibility = View.GONE
 
                         chatRoom?.participant?.user?.image?.decodeBase64()?.let { url ->
                             if (url.isNotEmpty()) {
