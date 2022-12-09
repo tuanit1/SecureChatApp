@@ -13,6 +13,7 @@ import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.ChatListRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,34 +35,34 @@ class ChatListViewModel(
                     call: Call<ResponseObject<MutableList<ChatRoom>>>,
                     response: Response<ResponseObject<MutableList<ChatRoom>>>
                 ) {
+                    viewModelScope.launch(Dispatchers.IO){
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                response.body()?.let { body ->
+                                    if (body.success) {
+                                        body.data?.let { data ->
+                                            mChatRooms.value = data
+                                        }
 
-                    API.checkTokenExpired(
-                        response,
-                        onTokenInUse = {
-                            response.body()?.let { body ->
-                                if (body.success) {
-                                    body.data?.let { data ->
-                                        mChatRooms.value = data
+                                        callback?.onSuccess()
+                                    } else {
+                                        Log.e("tuan", "status: false")
+                                        callback?.onError()
                                     }
-
-                                    callback?.onSuccess()
-                                } else {
-                                    Log.e("tuan", "status: false")
-                                    callback?.onError()
                                 }
+                            },
+                            onTokenUpdated = {
+                                loadRoomList(uid, callback)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = {
+                                callback?.onError()
                             }
-                        },
-                        onTokenUpdated = {
-                            loadRoomList(uid, callback)
-                        },
-                        onRefreshTokenExpired = {
-                            isTokenExpired.value = true
-                        },
-                        onError = {
-                            callback?.onError()
-                        }
-                    )
-
+                        )
+                    }
                 }
 
                 override fun onFailure(
@@ -87,13 +88,12 @@ class ChatListViewModel(
     }
 
     fun getCurrentUser(userID: String, callback: APICallback) {
-        viewModelScope.launch {
-            userRepository.getUserByID(userID).enqueue(object : Callback<ResponseObject<User>> {
-                override fun onResponse(
-                    call: Call<ResponseObject<User>>,
-                    response: Response<ResponseObject<User>>
-                ) {
-
+        userRepository.getUserByID(userID).enqueue(object : Callback<ResponseObject<User>> {
+            override fun onResponse(
+                call: Call<ResponseObject<User>>,
+                response: Response<ResponseObject<User>>
+            ) {
+                viewModelScope.launch(Dispatchers.IO) {
                     API.checkTokenExpired(
                         response,
                         onTokenInUse = {
@@ -114,53 +114,43 @@ class ChatListViewModel(
                         onError = { callback.onError() }
                     )
                 }
+            }
 
-                override fun onFailure(call: Call<ResponseObject<User>>, t: Throwable) {
-                    callback.onError(t)
-                }
-            })
-        }
+            override fun onFailure(call: Call<ResponseObject<User>>, t: Throwable) {
+                callback.onError(t)
+            }
+        })
     }
 
     fun addNewRoomToList(roomID: String) {
         try {
             viewModelScope.launch {
-                API.apiService.getRoomByID(Constant.mUID, roomID)
-                    .enqueue(object : Callback<ResponseObject<ChatRoom>> {
-                        override fun onResponse(
-                            call: Call<ResponseObject<ChatRoom>>,
-                            response: Response<ResponseObject<ChatRoom>>
-                        ) {
+                val response = API.apiService.getRoomByID(Constant.mUID, roomID)
 
-                            API.checkTokenExpired(
-                                response,
-                                onTokenInUse = {
-                                    if (response.isSuccessful) {
-                                        response.body()?.data?.let { chatRoom ->
-                                            mChatRooms.value?.toMutableList()?.apply {
-                                                add(chatRoom)
-                                                mChatRooms.postValue(this)
-                                            }
-                                        }
-                                    } else {
-                                        Log.e("tuan", "addNewRoomToList failed")
+                API.checkTokenExpired(
+                    response,
+                    onTokenInUse = {
+                        launch(Dispatchers.Main) {
+                            if (response.isSuccessful) {
+                                response.body()?.data?.let { chatRoom ->
+                                    mChatRooms.value?.toMutableList()?.apply {
+                                        add(chatRoom)
+                                        mChatRooms.postValue(this)
                                     }
-                                },
-                                onTokenUpdated = {
-                                    addNewRoomToList(roomID)
-                                },
-                                onRefreshTokenExpired = {
-                                    isTokenExpired.value = true
-                                },
-                                onError = {}
-                            )
+                                }
+                            } else {
+                                Log.e("tuan", "addNewRoomToList failed")
+                            }
                         }
-
-                        override fun onFailure(call: Call<ResponseObject<ChatRoom>>, t: Throwable) {
-                            Log.e("tuan", "addNewRoomToList failed ${t.message}")
-                        }
-
-                    })
+                    },
+                    onTokenUpdated = {
+                        addNewRoomToList(roomID)
+                    },
+                    onRefreshTokenExpired = {
+                        isTokenExpired.value = true
+                    },
+                    onError = {}
+                )
 
             }
 

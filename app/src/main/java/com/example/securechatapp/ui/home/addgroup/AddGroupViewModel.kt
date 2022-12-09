@@ -7,11 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Room
-import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.model.User
+import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.extension.encodeBase64
 import com.example.securechatapp.utils.Constant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -34,34 +35,36 @@ class AddGroupViewModel(private val repository: UserRepository) : ViewModel() {
                     response: Response<ResponseObject<MutableList<User>>>
                 ) {
 
-                    API.checkTokenExpired(
-                        response,
-                        onTokenInUse = {
-                            response.body()?.let { body ->
-                                if (body.success) {
-                                    body.data?.let { data ->
-                                        val filteredList =
-                                            data.filter { user -> user.uid != Constant.mUID }
-                                        mUsers.value = filteredList.toMutableList()
+                    viewModelScope.launch(Dispatchers.IO) {
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                response.body()?.let { body ->
+                                    if (body.success) {
+                                        body.data?.let { data ->
+                                            val filteredList =
+                                                data.filter { user -> user.uid != Constant.mUID }
+                                            mUsers.value = filteredList.toMutableList()
+                                        }
+
+                                        isLoaded = true
+
+                                        callback.onSuccess()
+                                    } else {
+                                        Log.e("tuan", "status: false")
+                                        callback.onError()
                                     }
-
-                                    isLoaded = true
-
-                                    callback.onSuccess()
-                                } else {
-                                    Log.e("tuan", "status: false")
-                                    callback.onError()
                                 }
-                            }
-                        },
-                        onTokenUpdated = {
-                            loadUserList(callback)
-                        },
-                        onRefreshTokenExpired = {
-                            isTokenExpired.value = true
-                        },
-                        onError = { callback.onError() }
-                    )
+                            },
+                            onTokenUpdated = {
+                                loadUserList(callback)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = { callback.onError() }
+                        )
+                    }
                 }
 
                 override fun onFailure(
@@ -77,19 +80,18 @@ class AddGroupViewModel(private val repository: UserRepository) : ViewModel() {
 
     fun addNewGroup(groupName: String) {
 
-        viewModelScope.launch {
+        val body = HashMap<String, String>().apply {
+            set("name", groupName.encodeBase64())
+            set("image_ic", "")
+        }
 
-            val body = HashMap<String, String>().apply {
-                set("name", groupName.encodeBase64())
-                set("image_ic", "")
-            }
-
-            API.apiService.addRoom(Constant.mUID, body)
-                .enqueue(object : Callback<ResponseObject<Room>> {
-                    override fun onResponse(
-                        call: Call<ResponseObject<Room>>,
-                        response: Response<ResponseObject<Room>>
-                    ) {
+        API.apiService.addRoom(Constant.mUID, body)
+            .enqueue(object : Callback<ResponseObject<Room>> {
+                override fun onResponse(
+                    call: Call<ResponseObject<Room>>,
+                    response: Response<ResponseObject<Room>>
+                ) {
+                    viewModelScope.launch(Dispatchers.IO) {
                         API.checkTokenExpired(
                             response,
                             onTokenInUse = {
@@ -149,19 +151,15 @@ class AddGroupViewModel(private val repository: UserRepository) : ViewModel() {
                             onError = {}
                         )
                     }
+                }
 
-                    override fun onFailure(call: Call<ResponseObject<Room>>, t: Throwable) {
-                        Log.e(
-                            "tuan",
-                            this@AddGroupViewModel.javaClass.name + ": " + t.message.toString()
-                        )
-                    }
-
-                })
-
-
-        }
-
+                override fun onFailure(call: Call<ResponseObject<Room>>, t: Throwable) {
+                    Log.e(
+                        "tuan",
+                        this@AddGroupViewModel.javaClass.name + ": " + t.message.toString()
+                    )
+                }
+            })
     }
 
     fun checkUser(index: Int, isCheck: Boolean) {

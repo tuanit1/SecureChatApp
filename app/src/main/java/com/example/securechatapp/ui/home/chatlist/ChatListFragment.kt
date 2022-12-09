@@ -71,7 +71,6 @@ class ChatListFragment : Fragment() {
 
             override fun onSuccess(data: Any?) {
                 if(data is User){
-
                     val url = data.image.decodeBase64()
 
                     if(url.isNotEmpty()){

@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.R
-import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.Participant
 import com.example.securechatapp.databinding.FragmentChatSettingBinding
@@ -19,7 +18,6 @@ import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.ui.home.chatsetting.dialog.UserPrivilegeDialog
 import com.example.securechatapp.utils.InjectorUtils
-import com.google.android.material.snackbar.Snackbar
 
 
 class ChatSettingFragment : Fragment() {

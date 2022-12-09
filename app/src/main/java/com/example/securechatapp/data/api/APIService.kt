@@ -4,7 +4,6 @@ import com.example.securechatapp.data.model.*
 import com.example.securechatapp.data.model.api.AuthToken
 import com.example.securechatapp.data.model.api.ResponseObject
 import retrofit2.Call
-import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -18,7 +17,7 @@ interface APIService {
     suspend fun logoutToken()
 
     @POST("auth/token")
-    fun refreshToken(@Body body: HashMap<String, String>): Call<ResponseObject<AuthToken>>
+    suspend fun refreshToken(@Body body: HashMap<String, String>): Response<ResponseObject<AuthToken>>
 
     //ROOM
     @GET("room/{uid}")

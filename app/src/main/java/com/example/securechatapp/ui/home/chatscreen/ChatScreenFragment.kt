@@ -82,8 +82,7 @@ class ChatScreenFragment : Fragment() {
             rv.itemAnimator = DefaultItemAnimator()
         }
 
-        loadChatRoom()
-        loadMessages()
+        fetchScreenData()
     }
 
     private fun initListener() {
@@ -336,46 +335,45 @@ class ChatScreenFragment : Fragment() {
         }
     }
 
-    private fun loadMessages() {
-        mRoomID?.let {
-            mViewModel?.loadMessage(it, callback = object : APICallback {
-                override fun onStart() {
-                    binding?.progressBarRV?.visibility = View.VISIBLE
-                }
+    private fun fetchScreenData(){
+        mRoomID?.let { roomID ->
+            mViewModel?.run {
+                fetchScreenData(
+                    roomID,
+                    roomCallback = object : APICallback {
+                        override fun onStart() {
+                            binding?.titleProgressbar?.visibility = View.VISIBLE
+                            binding?.clTitle?.visibility = View.GONE
+                        }
 
-                override fun onSuccess(data: Any?) {
-                    binding?.progressBarRV?.visibility = View.GONE
-                }
+                        override fun onSuccess(data: Any?) {
+                            binding?.titleProgressbar?.visibility = View.GONE
+                            binding?.clTitle?.visibility = View.VISIBLE
+                        }
 
-                override fun onError(t: Throwable?) {
-                    binding?.progressBarRV?.visibility = View.GONE
-                    Toast.makeText(context, "Something wrong happened!", Toast.LENGTH_SHORT).show()
-                }
+                        override fun onError(t: Throwable?) {
+                            binding?.titleProgressbar?.visibility = View.GONE
+                            binding?.clTitle?.visibility = View.VISIBLE
+                        }
+                    },
 
-            })
-        }
-    }
+                    messageCallback = object : APICallback {
+                        override fun onStart() {
+                            binding?.progressBarRV?.visibility = View.VISIBLE
+                        }
 
-    private fun loadChatRoom() {
-        mRoomID?.let {
-            mViewModel?.loadRoom(it, callback = object : APICallback {
-                override fun onStart() {
-                    binding?.titleProgressbar?.visibility = View.VISIBLE
-                    binding?.clTitle?.visibility = View.GONE
-                }
+                        override fun onSuccess(data: Any?) {
+                            binding?.progressBarRV?.visibility = View.GONE
+                        }
 
-                override fun onSuccess(data: Any?) {
-                    binding?.titleProgressbar?.visibility = View.GONE
-                    binding?.clTitle?.visibility = View.VISIBLE
-                }
+                        override fun onError(t: Throwable?) {
+                            binding?.progressBarRV?.visibility = View.GONE
+                            Toast.makeText(context, "Something wrong happened!", Toast.LENGTH_SHORT).show()
+                        }
 
-                override fun onError(t: Throwable?) {
-                    binding?.titleProgressbar?.visibility = View.GONE
-                    binding?.clTitle?.visibility = View.VISIBLE
-                }
-            })
-
-            mViewModel?.loadParticipant(it)
+                    }
+                )
+            }
         }
     }
 
