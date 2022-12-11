@@ -1,4 +1,4 @@
-package com.example.securechatapp.ui.home.chatsetting.dialog
+package com.example.securechatapp.ui.home.chatscreen.chatsetting.dialog
 
 import android.app.Dialog
 import android.graphics.Color

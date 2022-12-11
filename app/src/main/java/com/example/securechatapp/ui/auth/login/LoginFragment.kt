@@ -46,7 +46,6 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initView()
         initListener()
-
     }
 
     private fun initView() {
@@ -84,6 +83,7 @@ class LoginFragment : Fragment() {
                     .addOnCompleteListener{
                         if(it.isSuccessful){
                             Constant.mUID = it.result?.user?.uid ?: ""
+                            Constant.mIsExpiredDialogShowed = false
 
                             if(Constant.mUID.isNotEmpty()){
                                 mViewModel?.getAuthToken(object: APICallback{

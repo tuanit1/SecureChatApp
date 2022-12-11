@@ -1,4 +1,4 @@
-package com.example.securechatapp.ui.home.chatsetting
+package com.example.securechatapp.ui.home.chatscreen.chatsetting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

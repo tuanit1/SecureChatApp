@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.securechatapp.R
 import com.example.securechatapp.data.api.API
@@ -23,8 +24,10 @@ import com.example.securechatapp.databinding.ActivityMainBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.ui.auth.login.LoginFragment
 import com.example.securechatapp.ui.home.HomeFragment
+import com.example.securechatapp.ui.home.setting.setuppin.SetupPinFragment
 import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.Constant
+import com.example.securechatapp.widget.MessageDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     var chatSettingHandleParticipant: (Participant) -> Unit = {}
     var chatScreenHandleParticipant: (Participant) -> Unit = {}
     var onActivityResultListener : (data: Intent?) -> Unit = {}
+    var onTogglePINResult: (Boolean) -> Unit = {}
     var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,16 +69,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initListener() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val count = supportFragmentManager.backStackEntryCount
-                if (count > 1) {
-                    supportFragmentManager.popBackStack()
-                } else {
-                    finish()
-                }
-            }
-        })
+
+        handleBackPress()
 
         AppSocket.getInstance().run {
             onListenMessage = {
@@ -86,6 +82,35 @@ class MainActivity : AppCompatActivity() {
                 chatSettingHandleParticipant(it)
                 chatScreenHandleParticipant(it)
             }
+        }
+    }
+
+    private fun handleBackPress() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val count = supportFragmentManager.backStackEntryCount
+                if (count > 1) {
+                    when(val currentFragment = supportFragmentManager.fragments.last()){
+                        is SetupPinFragment -> {
+                            currentFragment.handleChildFragmentBackPress()
+                        }
+                        else -> {
+                            supportFragmentManager.popBackStack()
+                        }
+                    }
+                } else {
+                    finish()
+                }
+            }
+        })
+    }
+
+    private fun Fragment.handleChildFragmentBackPress(){
+        val count = childFragmentManager.backStackEntryCount
+        if(count > 1){
+            childFragmentManager.popBackStack()
+        }else{
+            supportFragmentManager.popBackStack()
         }
     }
 
@@ -102,6 +127,7 @@ class MainActivity : AppCompatActivity() {
             } else {
 
                 Constant.mUID = currentUser?.uid ?: ""
+                Constant.mIsExpiredDialogShowed = false
 
                 addFragment(
                     containerId = getContainerId(),
@@ -170,7 +196,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun handleLogout(){
-
         Firebase.auth.signOut()
         Constant.mUID = ""
 
@@ -194,6 +219,27 @@ class MainActivity : AppCompatActivity() {
             addToBackStack = true,
             tag = getString(R.string.login)
         )
+    }
+
+    fun handleLogoutExpired(){
+
+        if(!Constant.mIsExpiredDialogShowed){
+
+            Constant.mIsExpiredDialogShowed = true
+
+            MessageDialog.newInstance(
+                title = getString(R.string.author_expired)
+            ).apply {
+                onYesClickListener = {
+                    handleLogout()
+                }
+
+                onNoClickListener = {
+                    handleLogout()
+                }
+            }.show(supportFragmentManager, MessageDialog.TAG)
+        }
+
     }
 
 

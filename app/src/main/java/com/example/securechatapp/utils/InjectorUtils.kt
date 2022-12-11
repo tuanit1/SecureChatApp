@@ -6,15 +6,19 @@ import com.example.securechatapp.ui.auth.login.LoginViewModelFactory
 import com.example.securechatapp.ui.home.addgroup.AddGroupViewModelFactory
 import com.example.securechatapp.ui.home.chatlist.ChatListViewModelFactory
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenViewModelFactory
-import com.example.securechatapp.ui.home.chatsetting.ChatSettingViewModel
-import com.example.securechatapp.ui.home.chatsetting.ChatSettingViewModelFactory
+import com.example.securechatapp.ui.home.chatscreen.chatsetting.ChatSettingViewModel
+import com.example.securechatapp.ui.home.chatscreen.chatsetting.ChatSettingViewModelFactory
+import com.example.securechatapp.ui.home.setting.SettingViewModelFactory
+import com.example.securechatapp.ui.home.setting.setuppin.SetupPinViewModel
+import com.example.securechatapp.ui.home.setting.setuppin.SetupPinViewModelFactory
 import com.example.securechatapp.ui.home.userlist.UserListViewModelFactory
 
 object InjectorUtils {
-    fun provideChatListViewModelFactory(): ChatListViewModelFactory {
+    fun provideChatListViewModelFactory(context: Context): ChatListViewModelFactory {
         val chatRepository = ChatListRepository()
         val userRepository = UserRepository()
-        return ChatListViewModelFactory(chatRepository, userRepository)
+        val localRepository = LocalRepository(context)
+        return ChatListViewModelFactory(chatRepository, userRepository, localRepository)
     }
 
     fun provideAddGroupViewModelFactory(): AddGroupViewModelFactory {
@@ -44,5 +48,16 @@ object InjectorUtils {
     fun provideChatSettingViewModelFactory(): ChatSettingViewModelFactory {
         val participantRepository = ParticipantRepository()
         return ChatSettingViewModelFactory(participantRepository)
+    }
+
+    fun provideSettingViewModelFactory(context: Context): SettingViewModelFactory {
+        val userRepository = UserRepository()
+        val localRepository = LocalRepository(context)
+        return SettingViewModelFactory(userRepository, localRepository)
+    }
+
+    fun provideSetupPinViewModelFactory(context: Context): SetupPinViewModelFactory {
+        val localRepository = LocalRepository(context)
+        return SetupPinViewModelFactory(localRepository)
     }
 }

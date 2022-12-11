@@ -1,4 +1,4 @@
-package com.example.securechatapp.ui.home.chatsetting
+package com.example.securechatapp.ui.home.chatscreen.chatsetting
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData

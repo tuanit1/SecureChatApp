@@ -17,6 +17,7 @@ import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentUserListBinding
 import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.extension.decodeBase64
+import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
@@ -67,8 +68,18 @@ class UserListFragment : Fragment() {
             )
         }
 
+        listenTokenExpired()
         handleSearchRoom()
         handleRefreshing()
+    }
+
+    private fun listenTokenExpired() {
+        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
+            if(isExpired){
+                Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
+                (activity as MainActivity).handleLogoutExpired()
+            }
+        }
     }
 
     private fun handleRefreshing() {

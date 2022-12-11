@@ -22,6 +22,7 @@ import com.example.securechatapp.ui.home.addgroup.AddGroupFragment
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
+import com.example.securechatapp.widget.EnterPinDialog
 import com.squareup.picasso.Picasso
 
 
@@ -58,7 +59,7 @@ class ChatListFragment : Fragment() {
             rv.itemAnimator = DefaultItemAnimator()
         }
 
-        val factory = InjectorUtils.provideChatListViewModelFactory()
+        val factory = InjectorUtils.provideChatListViewModelFactory(requireContext())
         mViewModel = ViewModelProvider(this, factory)[ChatListViewModel::class.java]
 
         loadList()
@@ -66,19 +67,19 @@ class ChatListFragment : Fragment() {
     }
 
     private fun loadUserImage() {
-        mViewModel?.getCurrentUser(Constant.mUID, object : APICallback{
+        mViewModel?.getCurrentUser(Constant.mUID, object : APICallback {
             override fun onStart() = Unit
 
             override fun onSuccess(data: Any?) {
-                if(data is User){
+                if (data is User) {
                     val url = data.image.decodeBase64()
 
-                    if(url.isNotEmpty()){
+                    if (url.isNotEmpty()) {
                         Picasso.get()
                             .load(url)
                             .placeholder(R.drawable.ic_user_placeholder2)
                             .into(binding?.ivThumb)
-                    }else{
+                    } else {
                         Picasso.get()
                             .load(R.drawable.ic_user_placeholder2)
                             .into(binding?.ivThumb)
@@ -94,7 +95,7 @@ class ChatListFragment : Fragment() {
     }
 
     private fun loadList() {
-        mViewModel?.loadRoomList(Constant.mUID, object : APICallback{
+        mViewModel?.loadRoomList(Constant.mUID, object : APICallback {
             override fun onStart() {
                 binding?.progressBar?.visibility = View.VISIBLE
             }
@@ -114,7 +115,7 @@ class ChatListFragment : Fragment() {
 
     private fun initListener() {
         mViewModel?.run {
-            mChatRooms.observe(viewLifecycleOwner){ mChatRooms ->
+            mChatRooms.observe(viewLifecycleOwner) { mChatRooms ->
                 mAdapter?.setData(mChatRooms)
             }
         }
@@ -140,14 +141,21 @@ class ChatListFragment : Fragment() {
         }
 
         mAdapter?.onItemClickListener = { roomId ->
-            roomId?.let {
-                parentFragment?.addFragment(
-                    R.id.fragmentContainerView,
-                    ChatScreenFragment.newInstance(it),
-                    true,
-                    ChatScreenFragment::class.java.name
-                )
+
+            if (mViewModel?.checkIsTogglePIN() == false) {
+                openChatScreenFragment(roomId)
+            } else {
+                EnterPinDialog.newInstance().apply {
+                    onYesClickListener = {
+                        if(mViewModel?.checkPIN(it) == true){
+                            openChatScreenFragment(roomId)
+                        }else{
+                            Toast.makeText(context, "Wrong PIN code!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }.show(childFragmentManager, EnterPinDialog.TAG)
             }
+
         }
 
         (activity as MainActivity).run {
@@ -162,11 +170,23 @@ class ChatListFragment : Fragment() {
         handleSearchRoom()
     }
 
+    private fun openChatScreenFragment(roomId: String?) {
+        roomId?.let {
+            parentFragment?.addFragment(
+                R.id.fragmentContainerView,
+                ChatScreenFragment.newInstance(it),
+                true,
+                ChatScreenFragment::class.java.name
+            )
+        }
+    }
+
     private fun listenTokenExpired() {
-        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
-            if(isExpired){
-                Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
-                (activity as MainActivity).handleLogout()
+        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner) { isExpired ->
+            if (isExpired) {
+                Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT)
+                    .show()
+                (activity as MainActivity).handleLogoutExpired()
             }
         }
     }
@@ -182,9 +202,11 @@ class ChatListFragment : Fragment() {
             edtSearch.addTextChangedListener { text ->
 
                 mViewModel?.mChatRooms?.value?.let {
-                    val filterList = it.filter {  chatRoom ->
-                        chatRoom.room?.name?.decodeBase64()?.lowercase()?.contains(text.toString().lowercase()) == true ||
-                                chatRoom.participant?.user?.name?.decodeBase64()?.lowercase()?.contains(text.toString().lowercase()) == true
+                    val filterList = it.filter { chatRoom ->
+                        chatRoom.room?.name?.decodeBase64()?.lowercase()
+                            ?.contains(text.toString().lowercase()) == true ||
+                                chatRoom.participant?.user?.name?.decodeBase64()?.lowercase()
+                                    ?.contains(text.toString().lowercase()) == true
                     }
 
                     mAdapter?.setData(filterList)

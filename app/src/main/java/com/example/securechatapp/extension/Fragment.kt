@@ -38,3 +38,19 @@ fun Fragment.addFragment(
     }
 }
 
+fun Fragment.addChildFragment(
+    containerId: Int,
+    fragment: Fragment,
+    addToBackStack: Boolean = false,
+    tag: String
+) {
+    if (childFragmentManager.findFragmentByTag(tag) == null) {
+        childFragmentManager.commit {
+            add(containerId, fragment, tag)
+            if (addToBackStack) {
+                addToBackStack(tag)
+            }
+        }
+    }
+}
+

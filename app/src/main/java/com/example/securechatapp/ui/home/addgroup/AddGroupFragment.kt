@@ -63,7 +63,7 @@ class AddGroupFragment : Fragment() {
         mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
             if(isExpired){
                 Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
-                (activity as MainActivity).handleLogout()
+                (activity as MainActivity).handleLogoutExpired()
             }
         }
     }

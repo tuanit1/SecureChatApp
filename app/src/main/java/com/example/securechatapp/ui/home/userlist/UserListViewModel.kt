@@ -11,6 +11,7 @@ import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.RoomRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,6 +22,7 @@ class UserListViewModel(
     private val roomRepository: RoomRepository
 ) : ViewModel() {
     var mUsers: MutableLiveData<MutableList<User>> = MutableLiveData()
+    var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
 
     fun loadUserList(callback: APICallback) {
 
@@ -32,19 +34,34 @@ class UserListViewModel(
                     call: Call<ResponseObject<MutableList<User>>>,
                     response: Response<ResponseObject<MutableList<User>>>
                 ) {
-                    response.body()?.let { body ->
-                        if (body.success) {
-                            body.data?.let { data ->
-                                val filteredList = data.filter { user -> user.uid != Constant.mUID }
-                                mUsers.value = filteredList.toMutableList()
-                            }
+                    viewModelScope.launch(Dispatchers.IO) {
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                response.body()?.let { body ->
+                                    if (body.success) {
+                                        body.data?.let { data ->
+                                            val filteredList = data.filter { user -> user.uid != Constant.mUID }
+                                            mUsers.value = filteredList.toMutableList()
+                                        }
 
-                            callback.onSuccess()
-                        } else {
-                            Log.e("tuan", "status: false")
-                            callback.onError()
-                        }
+                                        callback.onSuccess()
+                                    } else {
+                                        Log.e("tuan", "status: false")
+                                        callback.onError()
+                                    }
+                                }
+                            },
+                            onTokenUpdated = {
+                                loadUserList(callback)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = { callback.onError() }
+                        )
                     }
+
                 }
 
                 override fun onFailure(
@@ -109,12 +126,27 @@ class UserListViewModel(
                     call: Call<ResponseObject<User>>,
                     response: Response<ResponseObject<User>>
                 ) {
-                    if(response.isSuccessful){
-                        response.body()?.data?.let { user ->
-                            callback.onSuccess(user)
-                        }
-                    }else{
-                        callback.onError()
+
+                    viewModelScope.launch(Dispatchers.IO) {
+                        API.checkTokenExpired(
+                            response,
+                            onTokenInUse = {
+                                if(response.isSuccessful){
+                                    response.body()?.data?.let { user ->
+                                        callback.onSuccess(user)
+                                    }
+                                }else{
+                                    callback.onError()
+                                }
+                            },
+                            onTokenUpdated = {
+                                getCurrentUser(userID, callback)
+                            },
+                            onRefreshTokenExpired = {
+                                isTokenExpired.value = true
+                            },
+                            onError = { callback.onError() }
+                        )
                     }
                 }
 

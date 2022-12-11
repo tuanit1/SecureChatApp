@@ -21,7 +21,7 @@ import com.example.securechatapp.extension.decodeBase64
 import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.HomeFragment
 import com.example.securechatapp.ui.home.chatlist.ChatListFragment
-import com.example.securechatapp.ui.home.chatsetting.ChatSettingFragment
+import com.example.securechatapp.ui.home.chatscreen.chatsetting.ChatSettingFragment
 import com.example.securechatapp.utils.InjectorUtils
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
@@ -291,7 +291,7 @@ class ChatScreenFragment : Fragment() {
         mViewModel?.isTokenExpired?.observe(viewLifecycleOwner){ isExpired ->
             if(isExpired){
                 Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT).show()
-                (activity as MainActivity).handleLogout()
+                (activity as MainActivity).handleLogoutExpired()
             }
         }
     }

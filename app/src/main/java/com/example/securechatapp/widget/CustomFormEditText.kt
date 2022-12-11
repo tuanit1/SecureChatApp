@@ -19,6 +19,7 @@ class CustomFormEditText @JvmOverloads constructor(
     private var binding: LayoutCustomFormEdtBinding? = null
 
     fun getText(): String = binding?.edtForm?.text.toString()
+
     var onTextChange: (text: String) -> Unit = {}
 
     init {
@@ -50,6 +51,14 @@ class CustomFormEditText @JvmOverloads constructor(
             }
         } finally {
             styleAttrs.recycle()
+        }
+    }
+
+    fun setEditTextFocus(state: Boolean){
+        if(state){
+            binding?.edtForm?.requestFocus()
+        }else{
+            binding?.edtForm?.clearFocus()
         }
     }
 }

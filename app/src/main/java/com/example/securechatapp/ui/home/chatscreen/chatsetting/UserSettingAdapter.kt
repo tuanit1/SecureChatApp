@@ -1,4 +1,4 @@
-package com.example.securechatapp.ui.home.chatsetting
+package com.example.securechatapp.ui.home.chatscreen.chatsetting
 
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +12,9 @@ import com.example.securechatapp.databinding.LayoutItemSettingUserBinding
 import com.example.securechatapp.extension.decodeBase64
 import com.squareup.picasso.Picasso
 
-class UserSettingAdapter: ListAdapter<Participant, UserSettingAdapter.ViewHolder>(ParticipantDiffCallback()) {
+class UserSettingAdapter: ListAdapter<Participant, UserSettingAdapter.ViewHolder>(
+    ParticipantDiffCallback()
+) {
 
     var onItemClick: (Participant) -> Unit = {}
 

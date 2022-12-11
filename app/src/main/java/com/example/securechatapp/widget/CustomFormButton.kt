@@ -19,7 +19,6 @@ class CustomFormButton @JvmOverloads constructor(
 
     var showProgress: (Boolean) -> Unit = {}
 
-
     init {
         initView(attrs)
     }

@@ -11,6 +11,7 @@ import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.data.model.api.ResponseObject
 import com.example.securechatapp.data.repository.ChatListRepository
+import com.example.securechatapp.data.repository.LocalRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,8 @@ import retrofit2.Response
 
 class ChatListViewModel(
     private val chatRepository: ChatListRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val localRepository: LocalRepository
 ) : ViewModel() {
 
     var mChatRooms: MutableLiveData<MutableList<ChatRoom>> = MutableLiveData()
@@ -35,7 +37,7 @@ class ChatListViewModel(
                     call: Call<ResponseObject<MutableList<ChatRoom>>>,
                     response: Response<ResponseObject<MutableList<ChatRoom>>>
                 ) {
-                    viewModelScope.launch(Dispatchers.IO){
+                    viewModelScope.launch(Dispatchers.IO) {
                         API.checkTokenExpired(
                             response,
                             onTokenInUse = {
@@ -158,4 +160,8 @@ class ChatListViewModel(
             Log.e("tuan", "addNewRoomToList failed")
         }
     }
+
+    fun checkPIN(pin: String) = localRepository.checkPIN(pin)
+
+    fun checkIsTogglePIN() = localRepository.isTogglePIN()
 }

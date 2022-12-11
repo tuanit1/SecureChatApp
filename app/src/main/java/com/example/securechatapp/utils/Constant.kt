@@ -8,4 +8,5 @@ object Constant {
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             .toString() + "/" + "SecureChatApp"
     var mUID = ""
+    var mIsExpiredDialogShowed: Boolean = false
 }

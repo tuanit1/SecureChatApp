@@ -1,4 +1,4 @@
-package com.example.securechatapp.ui.home.chatsetting
+package com.example.securechatapp.ui.home.chatscreen.chatsetting
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,7 +16,7 @@ import com.example.securechatapp.databinding.FragmentChatSettingBinding
 import com.example.securechatapp.extension.toJsonString
 import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
-import com.example.securechatapp.ui.home.chatsetting.dialog.UserPrivilegeDialog
+import com.example.securechatapp.ui.home.chatscreen.chatsetting.dialog.UserPrivilegeDialog
 import com.example.securechatapp.utils.InjectorUtils
 
 
@@ -169,7 +169,7 @@ class ChatSettingFragment : Fragment() {
             if (isExpired) {
                 Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT)
                     .show()
-                (activity as MainActivity).handleLogout()
+                (activity as MainActivity).handleLogoutExpired()
             }
         }
     }
