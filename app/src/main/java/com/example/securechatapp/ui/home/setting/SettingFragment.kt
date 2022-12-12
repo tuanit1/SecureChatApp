@@ -122,7 +122,9 @@ class SettingFragment : Fragment() {
             R.id.fragmentContainerView,
             SetupPinFragment.newInstance(),
             true,
-            SetupPinFragment.TAG
+            SetupPinFragment.TAG,
+            enterAnim = R.anim.slide_right_in,
+            popExit = R.anim.slide_right_out
         )
     }
 

@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.example.securechatapp.R
 import com.example.securechatapp.databinding.FragmentSetupPinBinding
-import com.example.securechatapp.extension.replaceChildFragment
+import com.example.securechatapp.extension.addChildFragment
 import com.example.securechatapp.ui.home.setting.setuppin.checkpassword.CheckPasswordFragment
 import com.example.securechatapp.ui.home.setting.setuppin.enterpin.EnterPinFragment
 import com.example.securechatapp.utils.InjectorUtils
@@ -65,28 +65,24 @@ class SetupPinFragment : Fragment() {
     }
 
     private fun addCheckPwFragment() {
-        replaceChildFragment(
+        addChildFragment(
             getSetupPinContainer(),
             CheckPasswordFragment.newInstance(),
             true,
             CheckPasswordFragment.TAG,
-            enterAnim = R.anim.slide_right_in,
-            exitAnim = R.anim.slide_right_out,
-            popEnter = R.anim.slide_right_in,
-            popExit = R.anim.slide_right_out
+            enterAnim = R.anim.slide_left_out,
+            popExit = R.anim.slide_left_in
         )
     }
 
     fun addEnterPINFragment() {
-        replaceChildFragment(
+        addChildFragment(
             getSetupPinContainer(),
             EnterPinFragment.newInstance(),
             true,
             EnterPinFragment.TAG,
-            enterAnim = R.anim.slide_left_out,
-            exitAnim = R.anim.slide_left_in,
-            popEnter = R.anim.slide_left_out,
-            popExit = R.anim.slide_left_in
+            enterAnim = R.anim.slide_right_in,
+            popExit = R.anim.slide_right_out,
         )
     }
 

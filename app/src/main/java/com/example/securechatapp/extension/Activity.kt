@@ -24,10 +24,15 @@ fun FragmentActivity.addFragment(
     containerId: Int,
     fragment: Fragment,
     addToBackStack: Boolean = false,
-    tag: String
+    tag: String,
+    enterAnim: Int = 0,
+    exitAnim: Int = 0,
+    popEnter: Int = 0,
+    popExit: Int = 0,
 ) {
     if (supportFragmentManager.findFragmentByTag(tag) == null) {
         supportFragmentManager.commit {
+            setCustomAnimations(enterAnim, exitAnim, popEnter, popExit)
             add(containerId, fragment, tag)
             if (addToBackStack) {
                 addToBackStack(tag)

@@ -425,7 +425,9 @@ class ChatScreenFragment : Fragment() {
             R.id.fragmentContainerView,
             ChatSettingFragment.newInstance(mRoomID),
             true,
-            ChatSettingFragment::class.java.name
+            ChatSettingFragment::class.java.name,
+            enterAnim = R.anim.slide_right_in,
+            popExit = R.anim.slide_right_out
         )
     }
 

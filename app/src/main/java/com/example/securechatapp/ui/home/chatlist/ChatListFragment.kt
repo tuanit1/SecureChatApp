@@ -135,7 +135,9 @@ class ChatListFragment : Fragment() {
                     R.id.fragmentContainerView,
                     addGroupFragment,
                     true,
-                    AddGroupFragment::class.java.name
+                    AddGroupFragment::class.java.name,
+                    enterAnim = R.anim.slide_bottom_in,
+                    popExit = R.anim.slide_bottom_out
                 )
             }
         }
@@ -176,7 +178,9 @@ class ChatListFragment : Fragment() {
                 R.id.fragmentContainerView,
                 ChatScreenFragment.newInstance(it),
                 true,
-                ChatScreenFragment::class.java.name
+                ChatScreenFragment::class.java.name,
+                enterAnim = R.anim.slide_bottom_in,
+                popExit = R.anim.slide_bottom_out
             )
         }
     }

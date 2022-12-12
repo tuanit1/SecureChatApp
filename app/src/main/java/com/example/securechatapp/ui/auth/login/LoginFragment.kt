@@ -64,7 +64,9 @@ class LoginFragment : Fragment() {
                     getContainerId(),
                     SignupFragment.newInstance(),
                     true,
-                    SignupFragment::class.java.name
+                    SignupFragment::class.java.name,
+                    enterAnim = R.anim.slide_left_in,
+                    popExit = R.anim.slide_left_out
                 )
             }
         }
@@ -124,7 +126,9 @@ class LoginFragment : Fragment() {
             getContainerId(),
             HomeFragment.newInstance(),
             addToBackStack = true,
-            tag = HomeFragment::class.java.name
+            tag = HomeFragment::class.java.name,
+            enterAnim = R.anim.slide_right_in,
+            exitAnim = R.anim.slide_right_out
         )
     }
 

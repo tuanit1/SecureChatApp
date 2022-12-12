@@ -217,7 +217,8 @@ class MainActivity : AppCompatActivity() {
             containerId = getContainerId(),
             fragment = LoginFragment.newInstance(),
             addToBackStack = true,
-            tag = getString(R.string.login)
+            tag = getString(R.string.login),
+            enterAnim = R.anim.slide_left_in
         )
     }
 
