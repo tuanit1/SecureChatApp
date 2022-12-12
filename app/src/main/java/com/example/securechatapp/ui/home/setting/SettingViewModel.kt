@@ -64,10 +64,14 @@ class SettingViewModel(
         }
     }
 
+    fun updateToggleState(){
+        isTogglePIN.value = localRepository.isTogglePIN()
+    }
+
     fun isInitPin() = localRepository.isInitPIN()
 
     fun setTogglePINState(isCheck: Boolean){
         localRepository.setTogglePIN(isCheck)
-        isTogglePIN.value = isCheck
+        updateToggleState()
     }
 }

@@ -23,6 +23,7 @@ class EnterPinDialog : DialogFragment() {
 
     private var binding: DialogPinBinding? = null
     var onYesClickListener: (String) -> Unit = {}
+    var onNoClickListener: () -> Unit = {}
     var mPin: String = ""
 
     override fun onCreateView(
@@ -65,6 +66,7 @@ class EnterPinDialog : DialogFragment() {
     private fun initListener() {
         binding?.run {
             ivCancel.setOnClickListener {
+                onNoClickListener()
                 dismiss()
             }
 

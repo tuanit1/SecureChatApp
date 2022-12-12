@@ -54,9 +54,6 @@ class CheckPasswordFragment : Fragment() {
             val email = auth.currentUser?.email
 
             tvEmail.text = getString(R.string.str_enter_pw_as_email, email)
-
-            edtPass.setEditTextFocus(true)
-            activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         }
     }
 
@@ -72,10 +69,6 @@ class CheckPasswordFragment : Fragment() {
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener{
                         if(it.isSuccessful){
-
-                            edtPass.setEditTextFocus(false)
-                            hideKeyboardFrom(requireContext(), edtPass)
-
                             (parentFragment as SetupPinFragment).addEnterPINFragment()
                         }else{
                             it.exception?.let { e ->

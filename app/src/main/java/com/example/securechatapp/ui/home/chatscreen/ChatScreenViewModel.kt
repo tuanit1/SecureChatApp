@@ -538,7 +538,12 @@ class ChatScreenViewModel(
     }
 
     fun setParticipantUpdateFromSocket(party: Participant){
-        mParticipant.postValue(party)
+        mChatRoom.value?.room?.id.let { roomID ->
+            if(party.user.uid == Constant.mUID && party.roomID == roomID){
+                mParticipant.postValue(party)
+            }
+        }
+
     }
 
 }

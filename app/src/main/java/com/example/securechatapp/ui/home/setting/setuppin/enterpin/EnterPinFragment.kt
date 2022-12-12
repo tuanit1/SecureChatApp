@@ -43,7 +43,6 @@ class EnterPinFragment : Fragment() {
             btnNext.setOnClickListener {
                 if(mPinCode.length == 6){
 
-                    hideKeyboardFrom(requireContext(), editPin)
                     Toast.makeText(context, "PIN saved", Toast.LENGTH_SHORT).show()
 
                     (parentFragment as SetupPinFragment).run {

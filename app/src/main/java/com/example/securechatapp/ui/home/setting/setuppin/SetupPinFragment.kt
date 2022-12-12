@@ -8,8 +8,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.example.securechatapp.R
 import com.example.securechatapp.databinding.FragmentSetupPinBinding
-import com.example.securechatapp.extension.addChildFragment
-import com.example.securechatapp.ui.home.setting.SettingViewModel
+import com.example.securechatapp.extension.replaceChildFragment
 import com.example.securechatapp.ui.home.setting.setuppin.checkpassword.CheckPasswordFragment
 import com.example.securechatapp.ui.home.setting.setuppin.enterpin.EnterPinFragment
 import com.example.securechatapp.utils.InjectorUtils
@@ -38,7 +37,23 @@ class SetupPinFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        initListener()
 
+    }
+
+    private fun initListener() {
+        binding?.run {
+            ivBack.setOnClickListener {
+                childFragmentManager.run {
+                    if (backStackEntryCount > 1) {
+                        popBackStack()
+                    } else {
+                        popFragment()
+                    }
+                }
+
+            }
+        }
     }
 
     private fun initView() {
@@ -49,29 +64,37 @@ class SetupPinFragment : Fragment() {
         addCheckPwFragment()
     }
 
-    private fun addCheckPwFragment(){
-        addChildFragment(
+    private fun addCheckPwFragment() {
+        replaceChildFragment(
             getSetupPinContainer(),
             CheckPasswordFragment.newInstance(),
             true,
-            CheckPasswordFragment.TAG
+            CheckPasswordFragment.TAG,
+            enterAnim = R.anim.slide_right_in,
+            exitAnim = R.anim.slide_right_out,
+            popEnter = R.anim.slide_right_in,
+            popExit = R.anim.slide_right_out
         )
     }
 
-    fun addEnterPINFragment(){
-        addChildFragment(
+    fun addEnterPINFragment() {
+        replaceChildFragment(
             getSetupPinContainer(),
             EnterPinFragment.newInstance(),
             true,
-            EnterPinFragment.TAG
+            EnterPinFragment.TAG,
+            enterAnim = R.anim.slide_left_out,
+            exitAnim = R.anim.slide_left_in,
+            popEnter = R.anim.slide_left_out,
+            popExit = R.anim.slide_left_in
         )
     }
 
-    fun savePin(pin: String){
+    fun savePin(pin: String) {
         mViewModel?.savePin(pin)
     }
 
-    fun popFragment(){
+    fun popFragment() {
         parentFragmentManager.popBackStack()
     }
 

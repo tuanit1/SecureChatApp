@@ -29,7 +29,7 @@ fun Fragment.addFragment(
     tag: String
 ) {
     if (parentFragmentManager.findFragmentByTag(tag) == null) {
-         parentFragmentManager.commit {
+        parentFragmentManager.commit {
             add(containerId, fragment, tag)
             if (addToBackStack) {
                 addToBackStack(tag)
@@ -38,15 +38,20 @@ fun Fragment.addFragment(
     }
 }
 
-fun Fragment.addChildFragment(
+fun Fragment.replaceChildFragment(
     containerId: Int,
     fragment: Fragment,
     addToBackStack: Boolean = false,
-    tag: String
+    tag: String,
+    enterAnim: Int,
+    exitAnim: Int,
+    popEnter: Int,
+    popExit: Int,
 ) {
     if (childFragmentManager.findFragmentByTag(tag) == null) {
         childFragmentManager.commit {
-            add(containerId, fragment, tag)
+            setCustomAnimations(enterAnim, exitAnim, popEnter, popExit)
+            replace(containerId, fragment, tag)
             if (addToBackStack) {
                 addToBackStack(tag)
             }

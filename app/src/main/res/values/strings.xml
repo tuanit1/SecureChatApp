@@ -29,5 +29,5 @@
     <string name="str_not_allow_view_file">You are not allow to view this file</string>
     <string name="str_pin_not_set">You have not set up a pin code yet. Set up now?</string>
     <string name="str_enter_pw_as_email">Please enter your password as %s</string>
-    <string name="enter">Enter</string>
+    <string name="enter">enter</string>
 </resources>

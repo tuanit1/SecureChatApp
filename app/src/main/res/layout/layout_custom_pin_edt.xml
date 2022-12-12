@@ -20,15 +20,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@null"
-            android:inputType="numberPassword"
             android:hint="@string/enter"
-            android:textColorHint="@color/gray"
+            android:inputType="numberPassword"
             android:textAlignment="center"
+            android:textColor="@color/chineseBlack"
+            android:textColorHint="@color/gray"
             android:textSize="60sp"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

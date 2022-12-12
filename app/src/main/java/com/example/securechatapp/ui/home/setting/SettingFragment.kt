@@ -18,6 +18,7 @@ import com.example.securechatapp.ui.home.setting.setuppin.SetupPinFragment
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.example.securechatapp.widget.ConfirmDialog
+import com.example.securechatapp.widget.EnterPinDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -67,6 +68,7 @@ class SettingFragment : Fragment() {
         }
     }
 
+
     private fun initListener() {
         binding?.run {
             btnLogout.setOnClickListener {
@@ -93,7 +95,15 @@ class SettingFragment : Fragment() {
 
 
                 }else{
-                    mViewModel?.setTogglePINState(false)
+                    EnterPinDialog.newInstance().apply {
+                        onYesClickListener = {
+                            mViewModel?.setTogglePINState(false)
+                        }
+
+                        onNoClickListener = {
+                            mViewModel?.updateToggleState()
+                        }
+                    }.show(childFragmentManager, EnterPinDialog.TAG)
                 }
             }
 
