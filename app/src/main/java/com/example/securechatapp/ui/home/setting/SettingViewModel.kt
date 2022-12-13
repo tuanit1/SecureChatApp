@@ -74,4 +74,6 @@ class SettingViewModel(
         localRepository.setTogglePIN(isCheck)
         updateToggleState()
     }
+
+    fun checkPin(pin: String) = localRepository.checkPIN(pin)
 }

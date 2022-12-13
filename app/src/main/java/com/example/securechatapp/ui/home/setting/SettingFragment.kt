@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.securechatapp.R
@@ -97,7 +98,12 @@ class SettingFragment : Fragment() {
                 }else{
                     EnterPinDialog.newInstance().apply {
                         onYesClickListener = {
-                            mViewModel?.setTogglePINState(false)
+                            if(mViewModel?.checkPin(it) == true){
+                                mViewModel?.setTogglePINState(false)
+                            }else{
+                                Toast.makeText(requireContext(), "Wrong PIN code!", Toast.LENGTH_SHORT).show()
+                                mViewModel?.updateToggleState()
+                            }
                         }
 
                         onNoClickListener = {
@@ -156,4 +162,6 @@ class SettingFragment : Fragment() {
 
         })
     }
+
+
 }
