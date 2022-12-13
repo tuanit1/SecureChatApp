@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.example.securechatapp.databinding.FragmentEnterPinBinding
 import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.setting.setuppin.SetupPinFragment
+import com.google.android.material.snackbar.Snackbar
 
 class EnterPinFragment : Fragment() {
 
@@ -43,7 +44,7 @@ class EnterPinFragment : Fragment() {
             btnNext.setOnClickListener {
                 if(mPinCode.length == 6){
 
-                    Toast.makeText(context, "PIN saved", Toast.LENGTH_SHORT).show()
+                    Snackbar.make(requireView(), "PIN saved", Snackbar.LENGTH_SHORT).show()
 
                     (parentFragment as SetupPinFragment).run {
                         savePin(mPinCode)
@@ -54,12 +55,6 @@ class EnterPinFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun hideKeyboardFrom(context: Context, view: View) {
-        val imm: InputMethodManager =
-            context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     companion object {

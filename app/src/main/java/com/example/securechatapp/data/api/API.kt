@@ -172,7 +172,11 @@ object API {
                         }
                     }
                 }
-                else -> onError()
+                else -> {
+                    withContext(Dispatchers.Main){
+                        onError()
+                    }
+                }
             }
         }else{
             withContext(Dispatchers.Main){

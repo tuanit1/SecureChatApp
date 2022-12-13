@@ -21,6 +21,7 @@ import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.ui.home.chatscreen.ChatScreenFragment
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
+import com.example.securechatapp.widget.EnterPinDialog
 import com.squareup.picasso.Picasso
 
 class UserListFragment : Fragment() {
@@ -58,7 +59,19 @@ class UserListFragment : Fragment() {
                 otherUID = userId,
                 callback = { isSuccess, roomID ->
                     if(isSuccess){
-                        roomID?.let { openChatListFragment(it) }
+                        roomID?.let {
+                            EnterPinDialog.newInstance().apply {
+                                onYesClickListener = {
+                                    if(mViewModel?.checkPIN(it) == true){
+                                        openChatListFragment(roomID)
+                                    }else{
+                                        Toast.makeText(context, "Wrong PIN code!", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }.show(childFragmentManager, EnterPinDialog.TAG)
+
+
+                        }
                     }else{
                         Toast.makeText(context, "Something wrong happened!", Toast.LENGTH_SHORT).show()
                     }
@@ -93,7 +106,9 @@ class UserListFragment : Fragment() {
             R.id.fragmentContainerView,
             ChatScreenFragment.newInstance(roomID),
             true,
-            ChatScreenFragment::class.java.name
+            ChatScreenFragment::class.java.name,
+            enterAnim = R.anim.slide_left_in,
+            popExit = R.anim.slide_left_out
         )
     }
 
@@ -127,7 +142,7 @@ class UserListFragment : Fragment() {
     }
 
     private fun initView() {
-        val factory = InjectorUtils.provideUserListViewModelFactory()
+        val factory = InjectorUtils.provideUserListViewModelFactory(requireContext())
         mViewModel = ViewModelProvider(this, factory)[UserListViewModel::class.java]
 
         mAdapter = UserListAdapter()
@@ -187,5 +202,6 @@ class UserListFragment : Fragment() {
 
         })
     }
+
 
 }

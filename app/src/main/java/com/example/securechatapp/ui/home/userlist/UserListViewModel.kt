@@ -8,6 +8,7 @@ import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.data.model.api.ResponseObject
+import com.example.securechatapp.data.repository.LocalRepository
 import com.example.securechatapp.data.repository.RoomRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
@@ -19,7 +20,8 @@ import retrofit2.Response
 
 class UserListViewModel(
     private val userRepository: UserRepository,
-    private val roomRepository: RoomRepository
+    private val roomRepository: RoomRepository,
+    private val localRepository: LocalRepository,
 ) : ViewModel() {
     var mUsers: MutableLiveData<MutableList<User>> = MutableLiveData()
     var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -156,4 +158,6 @@ class UserListViewModel(
             })
         }
     }
+
+    fun checkPIN(pin: String) = localRepository.checkPIN(pin)
 }

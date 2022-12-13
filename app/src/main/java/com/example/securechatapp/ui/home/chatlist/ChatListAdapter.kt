@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.securechatapp.R
 import com.example.securechatapp.data.model.ChatRoom
+import com.example.securechatapp.data.model.Message
 import com.example.securechatapp.data.model.Room
 import com.example.securechatapp.databinding.LayoutItemRoomBinding
 import com.example.securechatapp.extension.decodeBase64
@@ -66,11 +67,31 @@ class ChatListAdapter(): RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
                         }
                     }
 
-                    if(item.message != null){
-                        tvTime.text = item.message?.time?.toFormattedDate()
-                        tvRoomLatestMessage.text = item.message?.message?.decodeBase64()
-                        tvTime.visibility = View.VISIBLE
-                    }else{
+                    item.message?.let { message ->
+
+                        when(message.type){
+                            Message.TEXT -> {
+                                tvTime.text = item.message?.time?.toFormattedDate()
+                                tvRoomLatestMessage.text = item.message?.message?.decodeBase64()
+                                tvTime.visibility = View.VISIBLE
+                            }
+
+                            Message.FILE -> {
+                                tvTime.text = item.message?.time?.toFormattedDate()
+                                tvRoomLatestMessage.text = "A file have been sent"
+                                tvTime.visibility = View.VISIBLE
+                            }
+
+                            Message.IMAGE -> {
+                                tvTime.text = item.message?.time?.toFormattedDate()
+                                tvRoomLatestMessage.text = "An image have been sent"
+                                tvTime.visibility = View.VISIBLE
+                            }
+
+                        }
+
+
+                    } ?: run {
                         tvTime.visibility = View.GONE
                         tvRoomLatestMessage.text = itemView.context.getString(R.string.no_message_yet)
                     }

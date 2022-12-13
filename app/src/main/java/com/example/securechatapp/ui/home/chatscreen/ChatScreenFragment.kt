@@ -401,8 +401,7 @@ class ChatScreenFragment : Fragment() {
                     },
 
                     messageCallback = object : APICallback {
-                        override fun onStart() {
-                            binding?.progressBarRV?.visibility = View.VISIBLE
+                        override fun onStart() { binding?.progressBarRV?.visibility = View.VISIBLE
                         }
 
                         override fun onSuccess(data: Any?) {

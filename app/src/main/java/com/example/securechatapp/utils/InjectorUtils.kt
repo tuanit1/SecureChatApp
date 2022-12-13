@@ -26,10 +26,11 @@ object InjectorUtils {
         return AddGroupViewModelFactory(repository)
     }
 
-    fun provideUserListViewModelFactory(): UserListViewModelFactory {
+    fun provideUserListViewModelFactory(context: Context): UserListViewModelFactory {
         val userRepository = UserRepository()
         val roomRepository = RoomRepository()
-        return UserListViewModelFactory(userRepository, roomRepository)
+        val localRepository = LocalRepository(context)
+        return UserListViewModelFactory(userRepository, roomRepository, localRepository)
     }
 
     fun provideChatScreenViewModelFactory(): ChatScreenViewModelFactory {

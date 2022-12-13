@@ -179,8 +179,8 @@ class ChatListFragment : Fragment() {
                 ChatScreenFragment.newInstance(it),
                 true,
                 ChatScreenFragment::class.java.name,
-                enterAnim = R.anim.slide_bottom_in,
-                popExit = R.anim.slide_bottom_out
+                enterAnim = R.anim.slide_left_in,
+                popExit = R.anim.slide_left_out
             )
         }
     }
