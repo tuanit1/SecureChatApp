@@ -24,7 +24,7 @@ object API {
 
         if (retrofit == null) {
             retrofit = Retrofit.Builder()
-                .baseUrl("http://${Constant.SERVER_URL}:8080/api/")
+                .baseUrl("${Constant.SERVER_URL}/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient)
                 .build()

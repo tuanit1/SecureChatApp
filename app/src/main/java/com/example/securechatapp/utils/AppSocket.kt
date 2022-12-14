@@ -8,8 +8,8 @@ import io.socket.client.IO
 import io.socket.client.Socket
 
 class AppSocket private constructor(){
-    var mSocketMessage: Socket = IO.socket("http://${Constant.SERVER_URL}:8080/message")
-    var mSocketParticipant: Socket = IO.socket("http://${Constant.SERVER_URL}:8080/participant")
+    var mSocketMessage: Socket = IO.socket("${Constant.SERVER_URL}/message")
+    var mSocketParticipant: Socket = IO.socket("${Constant.SERVER_URL}/participant")
     var onListenMessage: (ChatMessage) -> Unit  = {}
     var onListenParticipant: (Participant) -> Unit = {}
 

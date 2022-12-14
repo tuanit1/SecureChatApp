@@ -3,7 +3,7 @@ package com.example.securechatapp.utils
 import android.os.Environment
 
 object Constant {
-    const val SERVER_URL = "192.168.1.13"
+    const val SERVER_URL = "https://pbl6-attt-chatappsecure.onrender.com"
     var DOWNLOAD_PATH =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             .toString() + "/" + "SecureChatApp"
