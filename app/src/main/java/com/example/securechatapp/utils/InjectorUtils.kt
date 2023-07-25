@@ -14,32 +14,32 @@ import com.example.securechatapp.ui.home.setting.setuppin.SetupPinViewModelFacto
 import com.example.securechatapp.ui.home.userlist.UserListViewModelFactory
 
 object InjectorUtils {
-    fun provideChatListViewModelFactory(context: Context): ChatListViewModelFactory {
-        val chatRepository = ChatListRepository()
-        val userRepository = UserRepository()
-        val localRepository = LocalRepository(context)
-        return ChatListViewModelFactory(chatRepository, userRepository, localRepository)
-    }
+//    fun provideChatListViewModelFactory(context: Context): ChatListViewModelFactory {
+//        val chatRepository = ChatListRepository()
+//        val userRepository = UserRepository()
+//        val localRepository = LocalRepository(context)
+//        return ChatListViewModelFactory(chatRepository, userRepository, localRepository)
+//    }
 
     fun provideAddGroupViewModelFactory(): AddGroupViewModelFactory {
         val repository = UserRepository()
         return AddGroupViewModelFactory(repository)
     }
 
-    fun provideUserListViewModelFactory(context: Context): UserListViewModelFactory {
-        val userRepository = UserRepository()
-        val roomRepository = RoomRepository()
-        val localRepository = LocalRepository(context)
-        return UserListViewModelFactory(userRepository, roomRepository, localRepository)
-    }
+//    fun provideUserListViewModelFactory(context: Context): UserListViewModelFactory {
+//        val userRepository = UserRepository()
+//        val roomRepository = RoomRepository()
+//        val localRepository = LocalRepository(context)
+//        return UserListViewModelFactory(userRepository, roomRepository, localRepository)
+//    }
 
-    fun provideChatScreenViewModelFactory(): ChatScreenViewModelFactory {
-        val messageRepository = MessageRepository()
-        val roomRepository = RoomRepository()
-        val participantRepository = ParticipantRepository()
-
-        return ChatScreenViewModelFactory(roomRepository, messageRepository, participantRepository)
-    }
+//    fun provideChatScreenViewModelFactory(): ChatScreenViewModelFactory {
+//        val messageRepository = MessageRepository()
+//        val roomRepository = RoomRepository()
+//        val participantRepository = ParticipantRepository()
+//
+//        return ChatScreenViewModelFactory(roomRepository, messageRepository, participantRepository)
+//    }
 
     fun provideLoginViewModelFactory(context: Context): LoginViewModelFactory {
         val localRepository = LocalRepository(context)

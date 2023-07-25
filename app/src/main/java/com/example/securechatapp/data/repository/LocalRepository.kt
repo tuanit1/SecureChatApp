@@ -3,8 +3,12 @@ package com.example.securechatapp.data.repository
 import android.content.Context
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.utils.Constant
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class LocalRepository(context: Context) {
+class LocalRepository @Inject constructor(
+    @ApplicationContext context: Context
+) {
 
     companion object {
         private const val KEY_SHARED_PREFERENCE = "shared_preference_key"

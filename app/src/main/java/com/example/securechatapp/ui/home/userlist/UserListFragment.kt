@@ -142,8 +142,8 @@ class UserListFragment : Fragment() {
     }
 
     private fun initView() {
-        val factory = InjectorUtils.provideUserListViewModelFactory(requireContext())
-        mViewModel = ViewModelProvider(this, factory)[UserListViewModel::class.java]
+//        val factory = InjectorUtils.provideUserListViewModelFactory(requireContext())
+//        mViewModel = ViewModelProvider(this, factory)[UserListViewModel::class.java]
 
         mAdapter = UserListAdapter()
         binding?.run {

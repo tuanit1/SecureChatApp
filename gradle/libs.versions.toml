@@ -1,0 +1,26 @@
+[versions]
+#dependencies
+androidxCore = "1.9.0"
+googleService = "4.3.15"
+fragmentKtx = "1.6.0"
+activityKtx = "1.7.2"
+
+#plugins
+androidGradlePlugin = "7.3.1"
+kotlin = "1.8.20"
+hilt = "2.44"
+
+[libraries]
+androidx-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+google-service = { id = "com.google.gms.google-services", version.ref = "googleService" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }

@@ -28,12 +28,14 @@ import com.example.securechatapp.ui.home.setting.setuppin.SetupPinFragment
 import com.example.securechatapp.utils.AppSocket
 import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.widget.MessageDialog
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var binding: ActivityMainBinding? = null

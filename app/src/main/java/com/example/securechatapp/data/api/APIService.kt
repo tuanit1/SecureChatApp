@@ -21,7 +21,12 @@ interface APIService {
 
     //ROOM
     @GET("room/{uid}")
-    fun getRoomList(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
+    @JvmSuppressWildcards
+    suspend fun getRoomList(@Path("uid") uid: String): Response<ResponseObject.GetRoomListData<MutableList<ChatRoom>>>
+
+    @GET("room/{uid}")
+    @JvmSuppressWildcards
+    fun getRoomList2(@Path("uid") uid: String): Call<ResponseObject<MutableList<ChatRoom>>>
 
     @POST("room/{uid}")
     fun addRoom(
@@ -36,7 +41,7 @@ interface APIService {
     suspend fun getPrivateRoom(@Path("currentUID") currentUID: String, @Path("otherUID") otherUID: String): ResponseObject<ChatRoom>
 
     @GET("room/{uid}&{roomID}")
-    suspend fun getRoomByID(@Path("uid") uid: String, @Path("roomID") roomID: String): Response<ResponseObject<ChatRoom>>
+    suspend fun getRoomByID(@Path("uid") uid: String, @Path("roomID") roomID: String): Response<ResponseObject.GetRoomByIdData<ChatRoom>>
 
     //USER
     @GET("user")

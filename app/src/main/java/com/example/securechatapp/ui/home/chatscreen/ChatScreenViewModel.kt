@@ -57,81 +57,81 @@ class ChatScreenViewModel(
 
         roomCallback.onStart()
         messageCallback.onStart()
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val roomResponse = roomRepository.getRoomByID(Constant.mUID, roomID)
-            val messageResponse = messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
-            val partyResponse = participantRepository.getParticipantByRoomIDSuspend(roomID)
-
-            API.checkTokenExpiredThreeRequest(
-                roomResponse,
-                messageResponse,
-                partyResponse,
-                onTokenInUse = {
-                    //handle room
-                    if (roomResponse.isSuccessful) {
-                        if (roomResponse.body()?.success == true) {
-                            roomResponse.body()?.data?.let {
-                                mChatRoom.postValue(it)
-                                roomCallback.onSuccess()
-                            }
-                        }
-                    }
-
-                    //handle participant
-                    if(partyResponse.body()?.success == true){
-                        partyResponse.body()?.data?.let { list ->
-                            if(list.isNotEmpty()){
-                                mParticipant.value = list.find { it.user.uid == Constant.mUID }
-                            }
-                        }
-                    }
-
-                    //handle message
-                    if (messageResponse.body()?.success == true) {
-
-                        messageResponse.body()?.data?.let { list ->
-                            if (list.isNotEmpty()) {
-                                checkFileMessageDownload(list)
-
-                                if (mMessages.value != null) {
-                                    isAddToTop = true
-                                    mMessages.value =
-                                        mMessages.value?.toMutableList()?.apply {
-                                            addAll(0, list)
-                                        }
-                                } else {
-                                    isAddToTop = false
-
-                                    mMessages.value = list
-                                }
-
-                                mPage++
-                                Log.e("tuan", "${list.size} more messages added")
-                            }
-                        }
-
-                        messageCallback.onSuccess()
-                    } else {
-                        messageCallback.onError()
-                    }
-
-                    isFirstLoad = false
-
-                },
-                onTokenUpdated = {
-                    fetchScreenData(roomID, roomCallback, messageCallback)
-                },
-                onRefreshTokenExpired = {
-                    isTokenExpired.value = true
-                },
-                onError = {
-                    roomCallback.onError()
-                    messageCallback.onError()
-                }
-            )
-
-        }
+//
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val roomResponse = roomRepository.getRoomByID(Constant.mUID, roomID)
+//            val messageResponse = messageRepository.getMessagesByRoomID(roomID, mPage, mStep)
+//            val partyResponse = participantRepository.getParticipantByRoomIDSuspend(roomID)
+//
+//            API.checkTokenExpiredThreeRequest(
+//                roomResponse,
+//                messageResponse,
+//                partyResponse,
+//                onTokenInUse = {
+//                    //handle room
+//                    if (roomResponse.isSuccessful) {
+//                        if (roomResponse.body()?.success == true) {
+//                            roomResponse.body()?.data?.let {
+//                                mChatRoom.postValue(it)
+//                                roomCallback.onSuccess()
+//                            }
+//                        }
+//                    }
+//
+//                    //handle participant
+//                    if(partyResponse.body()?.success == true){
+//                        partyResponse.body()?.data?.let { list ->
+//                            if(list.isNotEmpty()){
+//                                mParticipant.value = list.find { it.user.uid == Constant.mUID }
+//                            }
+//                        }
+//                    }
+//
+//                    //handle message
+//                    if (messageResponse.body()?.success == true) {
+//
+//                        messageResponse.body()?.data?.let { list ->
+//                            if (list.isNotEmpty()) {
+//                                checkFileMessageDownload(list)
+//
+//                                if (mMessages.value != null) {
+//                                    isAddToTop = true
+//                                    mMessages.value =
+//                                        mMessages.value?.toMutableList()?.apply {
+//                                            addAll(0, list)
+//                                        }
+//                                } else {
+//                                    isAddToTop = false
+//
+//                                    mMessages.value = list
+//                                }
+//
+//                                mPage++
+//                                Log.e("tuan", "${list.size} more messages added")
+//                            }
+//                        }
+//
+//                        messageCallback.onSuccess()
+//                    } else {
+//                        messageCallback.onError()
+//                    }
+//
+//                    isFirstLoad = false
+//
+//                },
+//                onTokenUpdated = {
+//                    fetchScreenData(roomID, roomCallback, messageCallback)
+//                },
+//                onRefreshTokenExpired = {
+//                    isTokenExpired.value = true
+//                },
+//                onError = {
+//                    roomCallback.onError()
+//                    messageCallback.onError()
+//                }
+//            )
+//
+//        }
 
     }
 

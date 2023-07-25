@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,12 +25,13 @@ import com.example.securechatapp.utils.Constant
 import com.example.securechatapp.utils.InjectorUtils
 import com.example.securechatapp.widget.EnterPinDialog
 import com.squareup.picasso.Picasso
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class ChatListFragment : Fragment() {
 
     private var binding: FragmentChatListBinding? = null
-    private var mViewModel: ChatListViewModel? = null
+    private val mViewModel: ChatListViewModel? by viewModels()
     private var mAdapter: ChatListAdapter? = null
 
     companion object {
@@ -58,9 +60,6 @@ class ChatListFragment : Fragment() {
             rv.layoutManager = LinearLayoutManager(context)
             rv.itemAnimator = DefaultItemAnimator()
         }
-
-        val factory = InjectorUtils.provideChatListViewModelFactory(requireContext())
-        mViewModel = ViewModelProvider(this, factory)[ChatListViewModel::class.java]
 
         loadList()
         loadUserImage()

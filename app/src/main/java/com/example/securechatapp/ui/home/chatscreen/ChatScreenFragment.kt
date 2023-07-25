@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,7 +47,7 @@ class ChatScreenFragment : Fragment() {
     private var mRoomID: String? = null
     private var binding: FragmentChatScreenBinding? = null
     private var chatListFragment: ChatListFragment? = null
-    private var mViewModel: ChatScreenViewModel? = null
+    private val mViewModel: ChatScreenViewModel by viewModels()
     private var mAdapter: ChatScreenAdapter? = null
     private var resultCode: String? = null
     private var isAllowToSendFile: Boolean = true
@@ -72,9 +73,6 @@ class ChatScreenFragment : Fragment() {
         val frg =
             parentFragmentManager.findFragmentByTag(HomeFragment::class.java.name) as HomeFragment
         chatListFragment = frg.mAdapter?.mFragments?.get(0) as ChatListFragment
-
-        val factory = InjectorUtils.provideChatScreenViewModelFactory()
-        mViewModel = ViewModelProvider(this, factory)[ChatScreenViewModel::class.java]
 
         mAdapter = ChatScreenAdapter()
 
