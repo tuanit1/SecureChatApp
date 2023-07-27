@@ -111,9 +111,9 @@ object API {
     }
 
     suspend fun <D, U, T> checkTokenExpiredThreeRequest(
-        response1: Response<ResponseObject<D>>,
-        response2: Response<ResponseObject<U>>,
-        response3: Response<ResponseObject<T>>,
+        response1: Response<out ResponseObject<D>>,
+        response2: Response<out ResponseObject<U>>,
+        response3: Response<out ResponseObject<T>>,
         onTokenInUse: () -> Unit,
         onTokenUpdated: () -> Unit,
         onRefreshTokenExpired: () -> Unit,

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.securechatapp.base.BaseViewModel
 import com.example.securechatapp.data.api.API
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.ChatRoom
@@ -16,13 +17,10 @@ import com.example.securechatapp.data.repository.LocalRepository
 import com.example.securechatapp.data.repository.UserRepository
 import com.example.securechatapp.utils.Constant
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -33,7 +31,7 @@ class ChatListViewModel @Inject constructor(
     private val chatRepository: ChatListRepository,
     private val userRepository: UserRepository,
     private val localRepository: LocalRepository
-) : ViewModel() {
+) : BaseViewModel() {
 
     var mChatRooms: MutableLiveData<MutableList<ChatRoom>> = MutableLiveData()
     var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -41,30 +39,12 @@ class ChatListViewModel @Inject constructor(
     fun loadRoomList(uid: String, callback: APICallback? = null) {
         callback?.onStart()
         viewModelScope.launch {
-            val results = listOf(
-                chatRepository.getRoomList(uid),
-                chatRepository.getRoomByID(uid, "6364e01fa7ec08498dd9ba9e"),
-            )
-                .map { async { it } }
-                .map { it.await() }
-                .asFlow()
-                .collect {
-                    when(it) {
-                        is NetworkResult.Success -> {
-                            when (it.data) {
-                                is ResponseObject.GetRoomListData -> {
-                                    val a = it.data.data
-                                }
-                                is ResponseObject.GetRoomByIdData -> {
-                                    val b = 2
-                                }
-                            }
-                        }
-                        else -> {
-                            val b = 3
-                        }
-                    }
+            handleApiResponse(
+                request = suspend { chatRepository.getRoomList(uid) },
+                onApiSuccess = {
+                    val result = it
                 }
+            )
         }
 
 //        chatRepository.getRoomListA(uid)

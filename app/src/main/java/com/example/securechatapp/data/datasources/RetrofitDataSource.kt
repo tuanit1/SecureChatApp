@@ -8,7 +8,7 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 open class RetrofitDataSource {
-    suspend fun <T : Any> handleApi(
+    suspend fun <T : Any> safeCallApi(
         execute: suspend () -> Response<out ResponseObject<T>>
     ): NetworkResult<T> = withContext(Dispatchers.IO) {
         try {
