@@ -36,13 +36,12 @@ class ChatListViewModel @Inject constructor(
     var mChatRooms: MutableLiveData<MutableList<ChatRoom>> = MutableLiveData()
     var isTokenExpired: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun loadRoomList(uid: String, callback: APICallback? = null) {
-        callback?.onStart()
+    fun loadRoomList(uid: String) {
         viewModelScope.launch {
             handleApiResponse(
                 request = suspend { chatRepository.getRoomList(uid) },
                 onApiSuccess = {
-                    val result = it
+                    mChatRooms.value = it.data.data ?: mutableListOf()
                 }
             )
         }

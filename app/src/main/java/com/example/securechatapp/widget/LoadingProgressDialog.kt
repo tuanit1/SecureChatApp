@@ -15,6 +15,7 @@ class LoadingProgressDialog :
                     width = getWidthScreen()
                     height = getHeightScreen()
                 }
+                setDimAmount(0f)
             }
         }
     }

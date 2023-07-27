@@ -8,7 +8,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 data class ProgressViewState(val isShow: Boolean = false)
@@ -23,18 +25,26 @@ abstract class BaseViewModel : ViewModel() {
         onApiSuccess: (NetworkResult.Success<T>) -> Unit,
         onApiFailure: () -> Unit = {}
     ) {
+        _progressState.update { ProgressViewState(true) }
         viewModelScope.launch(Dispatchers.IO) {
             async { request() }.run {
                 await().let {
+                    _progressState.update { ProgressViewState(false) }
                     when (it) {
                         is NetworkResult.Success -> {
-                            onApiSuccess(it)
+                            withContext(Dispatchers.Main) {
+                                onApiSuccess(it)
+                            }
                         }
                         is NetworkResult.Error -> {
-                            onApiFailure()
+                            withContext(Dispatchers.Main) {
+                                onApiFailure()
+                            }
                         }
                         is NetworkResult.Exception -> {
-                            onApiFailure()
+                            withContext(Dispatchers.Main) {
+                                onApiFailure()
+                            }
                         }
                     }
                 }

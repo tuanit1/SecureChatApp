@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securechatapp.ui.MainActivity
 import com.example.securechatapp.R
+import com.example.securechatapp.base.BaseFragment
 import com.example.securechatapp.data.api.APICallback
 import com.example.securechatapp.data.model.User
 import com.example.securechatapp.databinding.FragmentChatListBinding
@@ -28,23 +29,16 @@ import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class ChatListFragment : Fragment() {
+class ChatListFragment : BaseFragment<FragmentChatListBinding, ChatListViewModel>(FragmentChatListBinding::inflate) {
 
-    private var binding: FragmentChatListBinding? = null
-    private val mViewModel: ChatListViewModel? by viewModels()
     private var mAdapter: ChatListAdapter? = null
 
     companion object {
         fun newInstance() = ChatListFragment()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentChatListBinding.inflate(inflater)
-        return binding?.root
-    }
+    override val viewModel: ChatListViewModel by viewModels()
+    
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,7 +46,7 @@ class ChatListFragment : Fragment() {
         initListener()
     }
 
-    private fun initView() {
+    override fun initView() {
         mAdapter = ChatListAdapter()
 
         binding?.run {
@@ -66,7 +60,7 @@ class ChatListFragment : Fragment() {
     }
 
     private fun loadUserImage() {
-        mViewModel?.getCurrentUser(Constant.mUID, object : APICallback {
+        viewModel.getCurrentUser(Constant.mUID, object : APICallback {
             override fun onStart() = Unit
 
             override fun onSuccess(data: Any?) {
@@ -94,26 +88,11 @@ class ChatListFragment : Fragment() {
     }
 
     private fun loadList() {
-        mViewModel?.loadRoomList(Constant.mUID, object : APICallback {
-            override fun onStart() {
-                binding?.progressBar?.visibility = View.VISIBLE
-            }
-
-            override fun onSuccess(data: Any?) {
-                binding?.progressBar?.visibility = View.GONE
-                binding?.swipeRefreshLayout?.isRefreshing = false
-            }
-
-            override fun onError(t: Throwable?) {
-                binding?.progressBar?.visibility = View.GONE
-                binding?.swipeRefreshLayout?.isRefreshing = false
-            }
-
-        })
+        viewModel.loadRoomList(Constant.mUID)
     }
 
-    private fun initListener() {
-        mViewModel?.run {
+    override fun initListener() {
+        viewModel.run {
             mChatRooms.observe(viewLifecycleOwner) { mChatRooms ->
                 mAdapter?.setData(mChatRooms)
             }
@@ -125,7 +104,7 @@ class ChatListFragment : Fragment() {
                 val addGroupFragment = AddGroupFragment.newInstance().apply {
                     onDoneListener = { isSuccess, roomUID ->
                         if (isSuccess) {
-                            roomUID?.let { mViewModel?.addNewRoomToList(roomUID) }
+                            roomUID?.let { viewModel.addNewRoomToList(roomUID) }
                         }
                     }
                 }
@@ -143,12 +122,12 @@ class ChatListFragment : Fragment() {
 
         mAdapter?.onItemClickListener = { roomId ->
 
-            if (mViewModel?.checkIsTogglePIN() == false) {
+            if (viewModel.checkIsTogglePIN() == false) {
                 openChatScreenFragment(roomId)
             } else {
                 EnterPinDialog.newInstance().apply {
                     onYesClickListener = {
-                        if(mViewModel?.checkPIN(it) == true){
+                        if(viewModel.checkPIN(it) == true){
                             openChatScreenFragment(roomId)
                         }else{
                             Toast.makeText(context, "Wrong PIN code!", Toast.LENGTH_SHORT).show()
@@ -161,7 +140,7 @@ class ChatListFragment : Fragment() {
 
         (activity as MainActivity).run {
             chatListHandleMessage = {
-                mViewModel?.updateLatestMessage(it)
+                viewModel.updateLatestMessage(it)
             }
         }
 
@@ -185,7 +164,7 @@ class ChatListFragment : Fragment() {
     }
 
     private fun listenTokenExpired() {
-        mViewModel?.isTokenExpired?.observe(viewLifecycleOwner) { isExpired ->
+        viewModel.isTokenExpired?.observe(viewLifecycleOwner) { isExpired ->
             if (isExpired) {
                 Toast.makeText(context, getString(R.string.author_expired), Toast.LENGTH_SHORT)
                     .show()
@@ -204,7 +183,7 @@ class ChatListFragment : Fragment() {
         binding?.run {
             edtSearch.addTextChangedListener { text ->
 
-                mViewModel?.mChatRooms?.value?.let {
+                viewModel.mChatRooms?.value?.let {
                     val filterList = it.filter { chatRoom ->
                         chatRoom.room?.name?.decodeBase64()?.lowercase()
                             ?.contains(text.toString().lowercase()) == true ||

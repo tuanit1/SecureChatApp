@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import com.example.securechatapp.extension.addFragment
 import com.example.securechatapp.widget.LoadingProgressDialog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -20,7 +21,9 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel>(
     private var _binding: VB? = null
     protected abstract val viewModel: VM
     protected val binding get() = _binding
-    private val circleProgress: LoadingProgressDialog by lazy { LoadingProgressDialog() }
+    private val circleProgress: LoadingProgressDialog by lazy {
+        LoadingProgressDialog()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,13 +43,21 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel>(
     }
 
     private fun initBase() {
+
+
         lifecycleScope.launch {
             viewModel.progressState.collectLatest { state ->
                 childFragmentManager.beginTransaction().run {
                     if (state.isShow) {
-                        show(circleProgress)
-                    } else {
-                        hide(circleProgress)
+                        if (circleProgress.isAdded) {
+                            circleProgress.dialog?.show()
+                        } else {
+                            circleProgress.show(childFragmentManager, null)
+                        }
+                    }else{
+                        if (circleProgress.isAdded) {
+                            circleProgress.dismiss()
+                        }
                     }
                     commit()
                 }

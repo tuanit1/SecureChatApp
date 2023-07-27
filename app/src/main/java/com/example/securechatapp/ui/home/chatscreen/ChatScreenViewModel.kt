@@ -53,7 +53,7 @@ class ChatScreenViewModel(
         roomID: String,
         roomCallback: APICallback,
         messageCallback: APICallback,
-    ){
+    ) {
 
         roomCallback.onStart()
         messageCallback.onStart()
@@ -79,9 +79,9 @@ class ChatScreenViewModel(
                     }
 
                     //handle participant
-                    if(partyResponse.body()?.success == true){
+                    if (partyResponse.body()?.success == true) {
                         partyResponse.body()?.data?.let { list ->
-                            if(list.isNotEmpty()){
+                            if (list.isNotEmpty()) {
                                 mParticipant.value = list.find { it.user.uid == Constant.mUID }
                             }
                         }
@@ -537,9 +537,9 @@ class ChatScreenViewModel(
         }
     }
 
-    fun setParticipantUpdateFromSocket(party: Participant){
+    fun setParticipantUpdateFromSocket(party: Participant) {
         mChatRoom.value?.room?.id.let { roomID ->
-            if(party.user.uid == Constant.mUID && party.roomID == roomID){
+            if (party.user.uid == Constant.mUID && party.roomID == roomID) {
                 mParticipant.postValue(party)
             }
         }
