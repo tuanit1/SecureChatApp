@@ -43,8 +43,6 @@ abstract class BaseFragment<VB : ViewBinding, VM : BaseViewModel>(
     }
 
     private fun initBase() {
-
-
         lifecycleScope.launch {
             viewModel.progressState.collectLatest { state ->
                 childFragmentManager.beginTransaction().run {

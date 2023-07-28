@@ -2,12 +2,17 @@ package com.example.securechatapp.data.repository
 
 import android.content.Context
 import com.example.securechatapp.data.api.API
+import com.example.securechatapp.data.datasources.AuthDataSource
+import com.example.securechatapp.data.datasources.RoomDataSource
 import com.example.securechatapp.utils.Constant
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class LocalRepository @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
+    private val authDataSource: AuthDataSource
 ) {
 
     companion object {
@@ -29,6 +34,13 @@ class LocalRepository @Inject constructor(
             putString(KEY_ACCESS_TOKEN, token)
             apply()
         }
+    }
+
+    suspend fun refreshToken(){
+        val body = hashMapOf(
+            "refreshToken" to getRefreshToken().toString()
+        )
+        authDataSource.refreshToken(body)
     }
 
     fun saveRefreshToken(token: String) {

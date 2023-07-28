@@ -3,6 +3,8 @@ package com.example.securechatapp.base
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.securechatapp.data.model.api.NetworkResult
+import com.example.securechatapp.data.model.api.ResponseError
+import com.example.securechatapp.data.repository.LocalRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import javax.inject.Inject
 
 data class ProgressViewState(val isShow: Boolean = false)
 
@@ -19,6 +21,7 @@ abstract class BaseViewModel : ViewModel() {
 
     private val _progressState = MutableStateFlow(ProgressViewState())
     val progressState: StateFlow<ProgressViewState> = _progressState.asStateFlow()
+    @Inject lateinit var mLocalRepository: LocalRepository
 
     fun <T> handleApiResponse(
         request: suspend () -> NetworkResult<T>,
@@ -37,8 +40,16 @@ abstract class BaseViewModel : ViewModel() {
                             }
                         }
                         is NetworkResult.Error -> {
-                            withContext(Dispatchers.Main) {
-                                onApiFailure()
+                            when(it.code) {
+                                ResponseError.ACCESS_TOKEN_EXPIRED -> {
+                                    mLocalRepository.refreshToken()
+                                }
+                                ResponseError.REFRESH_TOKEN_EXPIRED, ResponseError.REFRESH_TOKEN_INVALID -> {
+                                    //kick user out
+                                }
+                                else -> withContext(Dispatchers.Main) {
+                                    onApiFailure()
+                                }
                             }
                         }
                         is NetworkResult.Exception -> {

@@ -1,7 +1,9 @@
 package com.example.securechatapp.data.datasources
 
 import com.example.securechatapp.data.model.api.NetworkResult
+import com.example.securechatapp.data.model.api.ResponseError
 import com.example.securechatapp.data.model.api.ResponseObject
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
@@ -17,10 +19,11 @@ open class RetrofitDataSource {
             if (response.isSuccessful && body != null) {
                 NetworkResult.Success(body)
             } else {
-                NetworkResult.Error(code = response.code(), message = response.message())
+                val responseError = Gson().fromJson(response.errorBody()?.string(), ResponseError::class.java)
+                NetworkResult.Error(code = responseError.code, message = response.message())
             }
         } catch (e: HttpException) {
-            NetworkResult.Error(code = e.code(), message = e.message())
+            NetworkResult.Error(code = e.message(), message = e.message())
         } catch (e: Throwable) {
             NetworkResult.Exception(e)
         }
